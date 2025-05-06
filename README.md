@@ -80,5 +80,5 @@ http://localhost/crud-usuarios
 🤝 Contribuciones
 ¡Las contribuciones son bienvenidas! Podés hacer un fork del proyecto y enviar un pull request.
 
-🧑‍💻 Autor
+🧑‍💻 Autor:
 Desarrollado por Leonel.
