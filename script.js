@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("read.php")
       .then(res => res.json())
       .then(data => {
-        const tbody = document.querySelector("#userTable tbody");
+        const tbody = document.getElementById("userTableBody")
         tbody.innerHTML = "";
         data.forEach(user => {
           const row = `

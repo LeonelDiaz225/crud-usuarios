@@ -43,12 +43,12 @@ ini_set('display_errors', 1);
 <!-- Formulario para importar CSV -->
 <h2 style="text-align: center;">Importar desde CSV</h2>
 <form id="csvForm" action="import_csv.php" method="POST" enctype="multipart/form-data">
-  <input type="file" name="csv_file" accept=".csv" required>
+<input type="file" id="csvFile" name="csvFile" accept=".csv" required>
   <button type="submit">Importar CSV</button>
 </form>
 
 <!-- Tabla de usuarios -->
-<table >
+<table id="userTable">
   <thead >
     <tr>
       <th>Apellido y Nombre</th>
@@ -60,7 +60,7 @@ ini_set('display_errors', 1);
       <th>Acciones</th>
     </tr>
   </thead>
-  <tbody id="userTable">
+  <tbody id="userTableBody">
     <!-- Los datos de los usuarios se cargarán aquí por JavaScript -->
   </tbody>
 </table>

@@ -3,8 +3,8 @@ include "db.php";
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["csv_file"])) {
-    $file = $_FILES["csv_file"]["tmp_name"];
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["csvFile"])) {
+    $file = $_FILES["csvFile"]["tmp_name"];
 
     if (($handle = fopen($file, "r")) !== FALSE) {
         $firstRow = true;
@@ -37,7 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["csv_file"])) {
             $stmt->execute();
         }
         fclose($handle);
-        header("Location: index.php?import=success");
+        echo "Archivo CSV importado correctamente.";
+        exit;
     exit;
     } else {
         echo "No se pudo abrir el archivo CSV.";
