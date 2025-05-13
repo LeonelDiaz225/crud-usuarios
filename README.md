@@ -2,6 +2,7 @@
 # 📋 CRUD con Entornos Dinámicos y CSV
 
 Este proyecto es un sistema de gestión de datos que permite:
+-Gestionar usuarios mediante un sistema **CRUD** (Crear, Leer, Actualizar y Eliminar).
 - Crear **entornos de trabajo** (como "Capacitaciones Mayo 2025").
 - Cada entorno funciona como una **tabla independiente** en MySQL.
 - Cargar datos de usuarios manualmente o desde un archivo `.csv`.
@@ -107,12 +108,12 @@ Ejemplo Uno,20300123456,Empresa Uno,1122334455,uno@email.com,Comercio
 
 ## ✍️ Autor
 
-Desarrollado por [Tu Nombre]  
+Desarrollado por Leonel  
 Proyecto en XAMPP con PHP + MySQL
 
 ---
 
-## 💡 Sugerencias futuras
+## 💡 Actualizaciones futuras
 
 - Autenticación de usuarios
 - Roles por entorno
