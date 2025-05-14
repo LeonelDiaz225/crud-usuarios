@@ -106,13 +106,6 @@ Ejemplo Uno,20300123456,Empresa Uno,1122334455,uno@email.com,Comercio
 
 ---
 
-## ✍️ Autor
-
-Desarrollado por Leonel  
-Proyecto en XAMPP con PHP + MySQL
-
----
-
 ## 💡 Actualizaciones futuras
 
 - Autenticación de usuarios
