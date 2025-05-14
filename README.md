@@ -113,3 +113,4 @@ Ejemplo Uno,20300123456,Empresa Uno,1122334455,uno@email.com,Comercio
 - Exportación de registros a Excel
 - Edición en línea sin `prompt()`
 - Buscador por CUIT/DNI o nombre
+- Modificar/crear formato de tablas a gusto.
