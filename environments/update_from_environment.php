@@ -1,4 +1,5 @@
 <?php
+session_start();
 include "../includes/db.php";
 $tabla = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['tabla'] ?? '');
 $id = intval($_POST['id'] ?? 0);

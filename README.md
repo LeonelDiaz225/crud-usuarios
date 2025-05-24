@@ -1,21 +1,20 @@
-
 # 📋 CRUD con Entornos Dinámicos y CSV
 
-Este proyecto es un sistema de gestión de datos que permite:
--Gestionar usuarios mediante un sistema **CRUD** (Crear, Leer, Actualizar y Eliminar).
-- Crear **entornos de trabajo** (como "Capacitaciones Mayo 2025").
-- Cada entorno funciona como una **tabla independiente** en MySQL.
-- Cargar datos de usuarios manualmente o desde un archivo `.csv`.
-- Realizar operaciones CRUD dentro de cada entorno (crear, leer, editar, eliminar).
+Este proyecto es un sistema de gestión de datos multi-entorno que permite:
+- Gestionar usuarios y permisos mediante un sistema **CRUD** (Crear, Leer, Actualizar y Eliminar).
+- Crear **entornos de trabajo** independientes (por ejemplo, "Capacitaciones Mayo 2025").
+- Cada entorno funciona como una **tabla separada** en MySQL.
+- Cargar datos manualmente o importar desde archivos `.csv`.
+- Realizar operaciones CRUD dentro de cada entorno.
+- Control de acceso por usuario y roles (admin y usuarios estándar).
 
 ---
 
 ## 🛠️ Tecnologías utilizadas
-
 - PHP (Back-end)
-- MySQL (con XAMPP/phpMyAdmin)
+- MySQL (XAMPP/phpMyAdmin)
 - HTML5 / CSS3
-- JavaScript Vanilla
+- JavaScript Vanilla (sin frameworks)
 - Fetch API
 
 ---
@@ -24,16 +23,25 @@ Este proyecto es un sistema de gestión de datos que permite:
 
 ```
 crud-usuarios/
-├── index.php                       # Página principal para listar y crear entornos
-├── entorno.php                     # Visualiza y gestiona un entorno seleccionado
-├── create_environment.php          # Crea un nuevo entorno y su tabla correspondiente
-├── import_csv_to_environment.php   # Importa un CSV a la tabla de un entorno
-├── read.php                        # Lee los datos de un entorno (con ?tabla=...)
-├── update_from_environment.php     # Actualiza un registro específico en un entorno
-├── delete_from_environment.php     # Elimina un registro específico en un entorno
-├── db.php                          # Conexión a la base de datos
-├── script.js                       # Funcionalidad JS para CSV, edición y borrado
-├── style.css                       # Estilos personalizados
+├── index.php                       # Panel principal, listado de entornos y gestión de usuarios
+├── entorno.php                     # Visualización y gestión de un entorno seleccionado
+├── environments/
+│   ├── create_environment.php      # Crea un nuevo entorno y su tabla
+│   ├── delete_environment.php      # Elimina un entorno y su tabla
+│   ├── delete_from_environment.php # Elimina un registro de un entorno
+│   ├── import_csv_to_environment.php # Importa registros desde CSV
+│   ├── read.php                    # Lee los datos de un entorno (JSON)
+│   ├── update_from_environment.php # Actualiza un registro de un entorno
+├── includes/
+│   └── db.php                      # Conexión a la base de datos
+├── js/
+│   ├── script.js                   # Lógica JS para CRUD y CSV
+│   └── debug.js                    # Herramientas de depuración
+├── css/
+│   └── style.css                   # Estilos personalizados
+├── login.php                       # Login de usuarios
+├── logout.php                      # Cierre de sesión
+├── hash.php                        # Utilidad para generar hashes de contraseñas
 ```
 
 ---
@@ -41,7 +49,7 @@ crud-usuarios/
 ## 🧱 Base de datos MySQL
 
 ### 1. Tabla `entornos`
-Guarda los entornos creados (uno por cada tabla de trabajo).
+Registra los entornos creados (uno por cada tabla de trabajo).
 
 ```sql
 CREATE TABLE entornos (
@@ -51,7 +59,25 @@ CREATE TABLE entornos (
 );
 ```
 
-### 2. Tablas por entorno
+### 2. Tabla de usuarios
+Ejemplo de estructura para control de acceso:
+
+```sql
+CREATE TABLE usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  rol ENUM('admin','user') DEFAULT 'user',
+  puede_crear_entorno TINYINT(1) DEFAULT 0,
+  puede_eliminar_entorno TINYINT(1) DEFAULT 0,
+  puede_editar_entorno TINYINT(1) DEFAULT 0,
+  puede_editar_registros TINYINT(1) DEFAULT 0,
+  puede_eliminar_registros TINYINT(1) DEFAULT 0,
+  entornos_asignados TEXT
+);
+```
+
+### 3. Tablas por entorno
 Cada entorno genera su propia tabla con esta estructura:
 
 ```sql
@@ -66,18 +92,18 @@ CREATE TABLE nombre_entorno (
 );
 ```
 
-> ⚠️ `nombre_entorno` se genera automáticamente (con espacios reemplazados por guiones bajos).
+> ⚠️ `nombre_entorno` se genera automáticamente (espacios reemplazados por guiones bajos).
 
 ---
 
 ## 🚀 ¿Cómo usarlo?
 
-1. Copiá los archivos en `htdocs/` dentro de XAMPP.
-2. Asegurate de tener Apache y MySQL activos desde el panel de XAMPP.
-3. Creá la tabla `entornos` desde phpMyAdmin.
-4. Ingresá a `http://localhost/crud-usuarios` para comenzar.
-5. Creá un entorno como "Capacitaciones Mayo 2025".
-6. Ingresá al entorno para:
+1. Copia los archivos en `htdocs/` dentro de XAMPP.
+2. Asegúrate de tener Apache y MySQL activos desde el panel de XAMPP.
+3. Crea las tablas `entornos` y `usuarios` desde phpMyAdmin.
+4. Ingresa a `http://localhost/crud-usuarios` para comenzar.
+5. Crea un entorno (ejemplo: "Capacitaciones Mayo 2025").
+6. Ingresa al entorno para:
    - Cargar datos manualmente.
    - Importar desde `.csv`.
    - Editar y eliminar registros.
@@ -85,8 +111,7 @@ CREATE TABLE nombre_entorno (
 ---
 
 ## 📄 Formato del archivo CSV
-
-El archivo `.csv` debe tener 6 columnas:
+El archivo `.csv` debe tener 6 columnas, en este orden:
 
 ```
 Apellido y Nombre,CUIT o DNI,Razón Social,Teléfono,Correo Electrónico,Rubro
@@ -96,21 +121,23 @@ Ejemplo Uno,20300123456,Empresa Uno,1122334455,uno@email.com,Comercio
 ---
 
 ## ✅ Funcionalidades
-
+- [x] Autenticación de usuarios y control de permisos
 - [x] Crear entornos con su propia tabla
 - [x] Cargar registros manualmente
 - [x] Importar múltiples registros desde CSV
-- [x] Editar registros con `prompt()`
+- [x] Editar registros (modal o inline)
 - [x] Eliminar registros con confirmación
 - [x] Separación total entre entornos
+- [x] Gestión de roles y permisos
 
 ---
 
-## 💡 Actualizaciones futuras
-
-- Autenticación de usuarios
-- Roles por entorno
-- Exportación de registros a Excel
+## 💡 Mejoras y recomendaciones
+- Validación y sanitización de datos en frontend y backend
+- Exportación de registros a Excel o CSV
 - Edición en línea sin `prompt()`
 - Buscador por CUIT/DNI o nombre
-- Modificar/crear formato de tablas a gusto.
+- Documentación de endpoints y ejemplos de uso
+- Refactorización para separar lógica y presentación
+
+---

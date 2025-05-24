@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!isset($_SESSION["user_id"])) {
+    header("Location: login.php");
+    exit;
+}
+
 // Activar la visualización de errores para depuración
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -11,6 +17,12 @@ include "includes/db.php";
 $tabla = preg_replace('/[^a-zA-Z0-9_]/', '', $_GET['tabla'] ?? '');
 if (!$tabla) {
   die("<p>Error: Entorno no válido.</p><a href='index.php'>Volver a entornos</a>");
+}
+
+$entornos_asignados = isset($_SESSION['entornos_asignados']) ? explode(',', $_SESSION['entornos_asignados']) : [];
+if ($_SESSION['rol'] !== 'admin' && !in_array($tabla, $entornos_asignados)) {
+    echo "<p>No tienes acceso a este entorno.</p>";
+    exit;
 }
 
 // Verificar si la tabla existe
@@ -57,6 +69,8 @@ if (
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<a href="logout.php" style="float:right;">Cerrar sesión</a>
+
   <h1>Entorno: <?= htmlspecialchars($tabla) ?></h1>
   <a href="index.php" class="back-index">← Volver a entornos</a>
   
@@ -147,27 +161,7 @@ if (
       </form>
     </div>
   </div>
-  <!-- Scripts -->
   <script src="js/script.js"></script>
-  <script>
-  // Buscador general para la tabla de registros
-  document.addEventListener("DOMContentLoaded", function() {
-    const buscador = document.getElementById("buscadorGeneral");
-    const tabla = document.getElementById("userTableBody");
-
-    if (buscador && tabla) {
-      buscador.addEventListener("input", function() {
-        const filtro = buscador.value.toLowerCase();
-        const filas = tabla.querySelectorAll("tr");
-        filas.forEach(fila => {
-          // Evita ocultar la fila de "Cargando datos..."
-          if (fila.children.length < 7) return;
-          const textoFila = fila.textContent.toLowerCase();
-          fila.style.display = textoFila.includes(filtro) ? "" : "none";
-        });
-      });
-    }
-  });
-</script>
+ 
 </body>
 </html>
