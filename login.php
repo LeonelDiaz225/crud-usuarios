@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION["puede_editar_registros"] = $user["puede_editar_registros"];
                 $_SESSION["puede_eliminar_registros"] = $user["puede_eliminar_registros"];
                 $_SESSION["entornos_asignados"] = $user["entornos_asignados"];
+                $_SESSION['loggedin'] = true; 
                 header("Location: index.php");
                 exit;
             } else {

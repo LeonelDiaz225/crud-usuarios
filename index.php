@@ -14,7 +14,7 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 include "includes/db.php";
-
+ 
 if (esadmin() && isset($_POST['crear_usuario'])) {
   $username = trim($_POST['username'] ?? '');
   $password = $_POST['password'] ?? '';

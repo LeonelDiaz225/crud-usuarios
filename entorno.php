@@ -161,6 +161,11 @@ if (
       </form>
     </div>
   </div>
+  <script>
+    const puedeEditarRegistros = <?= isset($_SESSION['puede_editar_registros']) && $_SESSION['puede_editar_registros'] ? 'true' : 'false' ?>;
+    const puedeEliminarRegistros = <?= isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'] ? 'true' : 'false' ?>;
+    const tabla = "<?= htmlspecialchars($tabla) ?>"; // Aseguramos que la variable tabla también esté disponible globalmente
+  </script>
   <script src="js/script.js"></script>
  
 </body>

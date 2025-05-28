@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const csvFile = document.getElementById("csvFile");
   const userTableBody = document.getElementById("userTableBody");
 
+  // Leer permisos del body
+  const bodyElement = document.body;
+  const puedeEditar = bodyElement.dataset.puedeEditar === 'true';
+  const puedeEliminar = bodyElement.dataset.puedeEliminar === 'true';
+
   // Referencias al modal y formulario de edición
   const editModal = document.getElementById("editModal");
   const closeEditModal = document.getElementById("closeEditModal");
@@ -40,8 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(data => {
         console.log("Datos recibidos:", data);
         
-        // Limpiamos la tabla antes de añadir nuevos datos
-        userTableBody.innerHTML = "";
+        userTableBody.innerHTML = ""; // Limpiamos la tabla
 
         if (!Array.isArray(data)) {
           console.error("Los datos recibidos no son un array:", data);
@@ -56,12 +60,19 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Para cada registro, creamos una fila
         data.forEach(user => {
           const row = document.createElement("tr");
           row.setAttribute("data-id", user.id);
 
           // Creamos el contenido HTML de la fila
+          let actionsHtml = '';
+          if (puedeEditarRegistros) {
+            actionsHtml += '<button class="edit-btn">Editar</button>';
+          }
+          if (puedeEliminarRegistros) {
+            actionsHtml += ' <button class="delete-btn">Eliminar</button>';
+          }
+
           row.innerHTML = `
             <td>${user.apellido_nombre || ''}</td>
             <td>${user.cuit_dni || ''}</td>
@@ -70,8 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${user.correo || ''}</td>
             <td>${user.rubro || ''}</td>
             <td>
-              <button class="edit-btn">Editar</button>
-              <button class="delete-btn">Eliminar</button>
+              ${actionsHtml}
             </td>
           `;
 

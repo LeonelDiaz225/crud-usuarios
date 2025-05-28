@@ -4,6 +4,12 @@ include "../includes/db.php";
 $tabla = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['tabla'] ?? '');
 $id = intval($_POST['id'] ?? 0);
 
+if (!isset($_SESSION['puede_editar_registros']) || !$_SESSION['puede_editar_registros']) {
+  http_response_code(403); 
+  echo "No tienes permiso para editar registros.";
+  exit;
+}
+
 if (!$tabla || !$id) {
   http_response_code(400);
   echo "Datos inválidos.";
