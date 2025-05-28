@@ -96,21 +96,36 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
       </tr>
     </thead>
     <tbody>
-      <?php while ($row = $result->fetch_assoc()): ?>
+      <?php 
+      // Obtener los entornos asignados al usuario actual y convertirlos en un array
+      $entornos_permitidos_usuario = isset($_SESSION['entornos_asignados']) ? explode(',', $_SESSION['entornos_asignados']) : [];
+      
+      while ($row = $result->fetch_assoc()): 
+        // Verificar si el usuario tiene acceso al entorno actual
+        $nombre_entorno_actual = $row['nombre'];
+        $tiene_acceso = false;
+        if ($_SESSION['rol'] === 'admin' || in_array($nombre_entorno_actual, $entornos_permitidos_usuario)) {
+          $tiene_acceso = true;
+        }
+      ?>
         <tr>
-          <td><?= htmlspecialchars($row['nombre']) ?></td>
+          <td><?= htmlspecialchars($nombre_entorno_actual) ?></td>
           <td><?= $row['fecha_creacion'] ?></td>
           <td>
-          <form action="entorno.php" method="get" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
-  <input type="hidden" name="tabla" value="<?= htmlspecialchars($row['nombre']) ?>">
-  <button type="submit" class="action-btn ingresar" style="background:#42a5f5; color:white;">Ingresar</button>
-</form>
-<?php if ($_SESSION['puede_eliminar_entorno']) { ?>
-<form action="environments/delete_environment.php" method="POST" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
-  <input type="hidden" name="nombre" value="<?= htmlspecialchars($row['nombre']) ?>">
-  <button type="submit" class="action-btn eliminar" style="background:#f44336; color:white;">Eliminar</button>
-</form>
-<?php } ?>
+            <?php if ($tiene_acceso): ?>
+              <form action="entorno.php" method="get" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
+                <input type="hidden" name="tabla" value="<?= htmlspecialchars($nombre_entorno_actual) ?>">
+                <button type="submit" class="action-btn ingresar" style="background:#42a5f5; color:white;">Ingresar</button>
+              </form>
+              <?php if ($_SESSION['puede_eliminar_entorno']): ?>
+                <form action="environments/delete_environment.php" method="POST" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
+                  <input type="hidden" name="nombre" value="<?= htmlspecialchars($nombre_entorno_actual) ?>">
+                  <button type="submit" class="action-btn eliminar" style="background:#f44336; color:white;">Eliminar</button>
+                </form>
+              <?php endif; ?>
+            <?php else: ?>
+              <span style="color: red;">No tienes acceso a este entorno</span>
+            <?php endif; ?>
           </td>
         </tr>
       <?php endwhile; ?>
