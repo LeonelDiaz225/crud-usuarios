@@ -66,7 +66,10 @@ if (
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-<a href="logout.php" style="float:right;">Cerrar sesión</a>
+
+<div class="d-flex justify-content-end mb-3">
+    <a href="logout.php" class="btn btn-outline-danger">Cerrar sesión</a>
+  </div>
 
   <h1>Entorno: <?= htmlspecialchars($tabla) ?></h1>
   <a href="index.php" class="back-index">← Volver a entornos</a>
