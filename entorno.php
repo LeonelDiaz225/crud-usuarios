@@ -62,6 +62,8 @@ if (
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($tabla) ?> - Entorno</title>
   <link rel="stylesheet" href="css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 <a href="logout.php" style="float:right;">Cerrar sesión</a>
@@ -104,6 +106,14 @@ if (
 <div class="search-container">
   <input type="text" id="buscadorGeneral" placeholder="Buscar registros...">
 </div>
+
+<!-- Exportar a Excel -->
+<div class="exportar-container">
+  <button id="exportExcelBtn" class="btn btn-success btn-sm exportar-btn">
+    <i class="bi bi-file-earmark-excel"></i> Exportar
+  </button>
+</div>
+
   <!-- Tabla de registros -->
   <table>
     <thead>
@@ -157,6 +167,8 @@ if (
     const puedeEliminarRegistros = <?= isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'] ? 'true' : 'false' ?>;
     const tabla = "<?= htmlspecialchars($tabla) ?>"; // Aseguramos que la variable tabla también esté disponible globalmente
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/script.js"></script>
  
 </body>

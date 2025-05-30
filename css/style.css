@@ -424,3 +424,22 @@ action-btn {
   font-size: 18px;
   padding: 6px 10px;
 }
+
+/* Contenedor del botón exportar: solo su ancho, alineado a la izquierda */
+.exportar-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 18px auto;
+  display: flex;
+  justify-content: flex-start; /* Alinea el botón a la izquierda */
+}
+
+/* Botón exportar: solo el ancho de su contenido */
+.exportar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: unset;
+  width: auto;
+  box-shadow: none;
+}
