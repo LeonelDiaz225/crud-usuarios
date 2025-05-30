@@ -11,6 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPage = 1;
   const itemsPerPage = 5; // Puedes ajustar esto
 
+  const buscadorGeneral = document.getElementById("buscadorGeneral");
+  let searchTerm = "";
+
+  if (buscadorGeneral) {
+    buscadorGeneral.addEventListener("input", function() {
+      searchTerm = this.value;
+      loadUsers(1); // Buscar siempre desde la página 1
+    });
+  }
+
   // Leer permisos del body
   const bodyElement = document.body;
   const puedeEditar = bodyElement.dataset.puedeEditar === 'true';
@@ -39,7 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPage = page;
     console.log(`Intentando cargar usuarios para tabla: ${tabla}, página: ${page}, límite: ${itemsPerPage}`);
     
-    fetch(`environments/read.php?tabla=${tabla}&page=${page}&limit=${itemsPerPage}`)
+    let url = `environments/read.php?tabla=${tabla}&page=${page}&limit=${itemsPerPage}`;
+    if (searchTerm && searchTerm.trim() !== "") {
+      url += `&search=${encodeURIComponent(searchTerm.trim())}`;
+    }
+    fetch(url)
+
       .then(res => {
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
