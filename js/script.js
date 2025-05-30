@@ -419,4 +419,52 @@ if (exportBtn) {
       });
   });
 }
+
+// --- Dropdown de entornos asignados en crear usuario ---
+const dropdownItems = document.querySelectorAll('.entorno-item');
+const seleccionadosList = document.getElementById('entornosSeleccionados');
+const hiddenInputsDiv = document.getElementById('entornosHiddenInputs');
+let seleccionados = [];
+
+if (dropdownItems.length && seleccionadosList && hiddenInputsDiv) {
+  dropdownItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const nombre = this.getAttribute('data-nombre');
+      if (!seleccionados.includes(nombre)) {
+        seleccionados.push(nombre);
+        actualizarSeleccionados();
+      }
+    });
+  });
+
+  function actualizarSeleccionados() {
+    // Limpiar lista y inputs
+    seleccionadosList.innerHTML = '';
+    hiddenInputsDiv.innerHTML = '';
+    seleccionados.forEach(nombre => {
+      // Mostrar en la lista
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center py-1';
+      li.textContent = nombre;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm btn-danger ms-2 flex-shrink-0';
+      btn.style.width = '70px'; 
+      btn.textContent = 'Quitar';
+      btn.onclick = function() {
+        seleccionados = seleccionados.filter(n => n !== nombre);
+        actualizarSeleccionados();
+      };
+      li.appendChild(btn);
+      seleccionadosList.appendChild(li);
+      // Crear input oculto
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'entornos_asignados[]';
+      input.value = nombre;
+      hiddenInputsDiv.appendChild(input);
+    });
+  }
+}
 });
