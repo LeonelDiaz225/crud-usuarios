@@ -35,7 +35,7 @@ form {
 
 /* Inputs y Selects */
 input, select {
-  width: 100%;
+  width: 80%;
   padding: 12px;
   margin: 0;
   border: 1px solid #ddd;
@@ -96,7 +96,7 @@ button:active {
 table {
   width: 100%;
   max-width: 1200px;
-  margin: 30px auto;
+  margin: 5px auto;
   border-collapse: collapse;
   background-color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -324,4 +324,103 @@ action-btn {
   color: #fff;
 }
   
+}
+
+/* Search Input Styles */
+.search-container {
+    width: 100%;
+    max-width: 1200px;      
+    margin: 20px auto 20px auto; 
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;          
+    justify-content: flex-start;
+}
+
+#buscadorGeneral {
+    width: 200px;           
+    min-width: 0;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+
+@media (max-width: 768px) {
+  .search-container {
+    margin: 10px auto 10px auto;
+    padding: 0 5px;
+  }
+  #buscadorGeneral {
+    font-size: 15px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    margin: 8px auto 8px auto;
+    padding: 0 2px;
+  }
+  #buscadorGeneral {
+    font-size: 14px;
+    padding: 7px;
+  }
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 20px auto; 
+    padding-right: 0;
+    box-sizing: border-box;
+}
+
+#pagination-controls {
+    display: flex;
+    gap: 5px;
+    /* margin-left: auto; */
+    padding: 0;
+    margin-top: 0; 
+}
+
+#pagination-controls button {
+  background-color: #f0f0f0;
+  color: #337ab7;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  min-width: 40px;
+}
+
+#pagination-controls button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+  border-color: #c0c0c0;
+}
+
+#pagination-controls button:disabled {
+  background-color: #337ab7;
+  color: white;
+  border-color: #337ab7;
+  cursor: default;
+  font-weight: bold;
+}
+
+#pagination-controls span {
+  font-size: 14px;
+  margin: 0 5px;
+  color: #666;
+}
+
+#pagination-controls .arrow-button {
+  font-size: 18px;
+  padding: 6px 10px;
 }

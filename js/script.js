@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const csvForm = document.getElementById("csvForm");
   const csvFile = document.getElementById("csvFile");
   const userTableBody = document.getElementById("userTableBody");
+  const paginationControls = document.getElementById("pagination-controls"); // Nuevo
+  let currentPage = 1;
+  const itemsPerPage = 5; // Puedes ajustar esto
 
   // Leer permisos del body
   const bodyElement = document.body;
@@ -24,39 +27,50 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Elementos encontrados:", {
     csvForm: !!csvForm,
     csvFile: !!csvFile,
-    userTableBody: !!userTableBody
+    userTableBody: !!userTableBody,
+    paginationControls: !!paginationControls // Nuevo
   });
 
-  function loadUsers() {
+  function loadUsers(page = 1) { // Modificado para aceptar la página
     if (!tabla || !userTableBody) {
       console.error("No se puede cargar usuarios: falta tabla o contenedor");
       return;
     }
-
-    console.log("Intentando cargar usuarios para tabla:", tabla);
+    currentPage = page;
+    console.log(`Intentando cargar usuarios para tabla: ${tabla}, página: ${page}, límite: ${itemsPerPage}`);
     
-    fetch(`environments/read.php?tabla=${tabla}`)
+    fetch(`environments/read.php?tabla=${tabla}&page=${page}&limit=${itemsPerPage}`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
         }
         return res.json();
       })
-      .then(data => {
-        console.log("Datos recibidos:", data);
+      .then(response => { // Modificado para manejar la nueva estructura de respuesta
+        console.log("Datos recibidos:", response);
+        const data = response.data;
+        const totalItems = response.total;
         
         userTableBody.innerHTML = ""; // Limpiamos la tabla
 
         if (!Array.isArray(data)) {
           console.error("Los datos recibidos no son un array:", data);
+          userTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center">Error: los datos recibidos no son válidos</td></tr>';
+          updatePaginationControls(0, page, itemsPerPage);
           return;
         }
 
-        if (data.length === 0) {
+        if (data.length === 0 && page === 1) {
           console.log("No hay registros para mostrar");
           const emptyRow = document.createElement("tr");
           emptyRow.innerHTML = '<td colspan="7" style="text-align: center">No hay registros disponibles</td>';
           userTableBody.appendChild(emptyRow);
+          updatePaginationControls(0, page, itemsPerPage);
+          return;
+        } else if (data.length === 0 && page > 1) {
+          // Esto podría pasar si se navega a una página que ya no tiene datos (ej. después de eliminar)
+          console.log("No hay registros en esta página, volviendo a la primera.");
+          loadUsers(1); // Cargar la primera página
           return;
         }
 
@@ -90,6 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Activamos los botones de edición y eliminación
         activarBotones();
+        // Actualizamos los controles de paginación
+        updatePaginationControls(totalItems, page, itemsPerPage);
       })
       .catch(error => {
         console.error("Error al cargar datos:", error);
@@ -97,7 +113,84 @@ document.addEventListener("DOMContentLoaded", () => {
           userTableBody.innerHTML = `<tr><td colspan="7" style="color: red; text-align: center">
             Error al cargar datos: ${error.message}</td></tr>`;
         }
+        updatePaginationControls(0, currentPage, itemsPerPage); // Limpiar controles en caso de error
       });
+  }
+
+  function updatePaginationControls(totalItems, currentPage, itemsPerPage) {
+    if (!paginationControls) return;
+    paginationControls.innerHTML = ""; // Limpiar controles existentes
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    if (totalPages <= 1) return; // No mostrar controles si hay una sola página o ninguna
+
+    // Botón Anterior
+    if (currentPage > 1) {
+      const prevButton = document.createElement("button");
+      prevButton.textContent = "←"; // Changed to arrow
+      prevButton.classList.add("arrow-button"); // Add class for styling
+      prevButton.addEventListener("click", () => loadUsers(currentPage - 1));
+      paginationControls.appendChild(prevButton);
+    }
+
+    // Números de página (simplificado, podrías hacerlo más complejo con elipses)
+    // Mostrar hasta 5 números de página alrededor de la actual
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    if (currentPage <= 3) {
+        endPage = Math.min(totalPages, 5);
+    }
+    if (currentPage > totalPages - 3) {
+        startPage = Math.max(1, totalPages - 4);
+    }
+
+    if (startPage > 1) {
+        const firstButton = document.createElement("button");
+        firstButton.textContent = "1";
+        firstButton.addEventListener("click", () => loadUsers(1));
+        paginationControls.appendChild(firstButton);
+        if (startPage > 2) {
+            const ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            ellipsis.style.margin = "0 5px";
+            paginationControls.appendChild(ellipsis);
+        }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      const pageButton = document.createElement("button");
+      pageButton.textContent = i;
+      if (i === currentPage) {
+        pageButton.disabled = true;
+        pageButton.style.fontWeight = "bold";
+      }
+      pageButton.addEventListener("click", () => loadUsers(i));
+      paginationControls.appendChild(pageButton);
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            const ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            ellipsis.style.margin = "0 5px";
+            paginationControls.appendChild(ellipsis);
+        }
+        const lastButton = document.createElement("button");
+        lastButton.textContent = totalPages;
+        lastButton.addEventListener("click", () => loadUsers(totalPages));
+        paginationControls.appendChild(lastButton);
+    }
+
+    // Botón Siguiente
+    if (currentPage < totalPages) {
+      const nextButton = document.createElement("button");
+      nextButton.textContent = "→"; // Changed to arrow
+      nextButton.classList.add("arrow-button"); // Add class for styling
+      nextButton.addEventListener("click", () => loadUsers(currentPage + 1));
+      paginationControls.appendChild(nextButton);
+    }
   }
 
   function activarBotones() {

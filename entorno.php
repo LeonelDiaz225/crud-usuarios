@@ -5,11 +5,6 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 
-// Activar la visualización de errores para depuración
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Incluir conexión a la base de datos
 include "includes/db.php";
 
@@ -105,8 +100,9 @@ if (
 
   <h2 style="text-align: center">Registros en <?= htmlspecialchars($tabla) ?></h2>
 
-<div style="width: 30%; max-width: 200px; margin: 0 0 20px 130px;">
-  <input type="text" id="buscadorGeneral" placeholder="Buscar registros..." style="width:100%;padding:10px;border-radius:4px;border:1px solid #ccc;">
+  
+<div class="search-container">
+  <input type="text" id="buscadorGeneral" placeholder="Buscar registros...">
 </div>
   <!-- Tabla de registros -->
   <table>
@@ -128,17 +124,12 @@ if (
       </tr>
     </tbody>
   </table>
-
-  
-  <!-- Información de depuración opcional -->
-   <!--
-  <div id="debug-info" style="margin-top: 20px; padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd;">
-    <h3>Información de depuración</h3>
-    <div><strong>Tabla actual:</strong> <?= htmlspecialchars($tabla) ?></div>
-    <div><strong>URL:</strong> <?= htmlspecialchars($_SERVER['REQUEST_URI']) ?></div>
-    <div id="debug-output"></div>
+  <div class="pagination-container" style="display: flex; justify-content: flex-end; width: 100%;">
+    <div id="pagination-controls" style="text-align: center; margin-top: 20px;">
+      <!-- Los controles de paginación se cargarán aquí -->
+    </div>
   </div>
-  -->
+
   
   <!-- Modal de edición -->
   <div id="editModal" class="modal" style="display:none;">
