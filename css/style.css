@@ -268,35 +268,40 @@ input.form-control:-webkit-autofill:active {
     margin-top: 0; 
 }
 
+/* Botones de paginación acorde a la paleta oscura */
 #pagination-controls button {
-  background-color: #f0f0f0;
-  color: #337ab7;
-  border: 1px solid #ddd;
+  background-color: #2c3035 !important;
+  color: #f8f9fa !important;
+  border: 1px solid #444950 !important;
   padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   min-width: 40px;
+  box-shadow: none;
 }
 
 #pagination-controls button:hover:not(:disabled) {
-  background-color: #e0e0e0;
-  border-color: #c0c0c0;
+  background-color: #198754 !important; /* verde Bootstrap */
+  color: #fff !important;
+  border-color: #198754 !important;
 }
 
-#pagination-controls button:disabled {
-  background-color: #337ab7;
-  color: white;
-  border-color: #337ab7;
-  cursor: default;
+#pagination-controls button:disabled,
+#pagination-controls button.active,
+#pagination-controls button[aria-current="page"] {
+  background-color: #198754 !important;
+  color: #fff !important;
+  border-color: #198754 !important;
   font-weight: bold;
+  cursor: default;
 }
 
 #pagination-controls span {
   font-size: 14px;
   margin: 0 5px;
-  color: #666;
+  color: #b0b3b8;
 }
 
 #pagination-controls .arrow-button {

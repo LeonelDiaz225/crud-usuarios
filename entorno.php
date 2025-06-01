@@ -67,7 +67,6 @@ if (
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h4 mb-0">Entorno: <?= htmlspecialchars($tabla) ?></h1>
-    <a href="logout.php" class="btn btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
   </div>
   <a href="index.php" class="btn btn-link mb-3 px-0 text-light"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
 
@@ -147,16 +146,27 @@ if (
           <th>Teléfono</th>
           <th>Correo</th>
           <th>Rubro</th>
+          <?php if (
+          (isset($_SESSION['puede_editar_registros']) && $_SESSION['puede_editar_registros']) ||
+          (isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'])
+        ): ?>
           <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="userTableBody">
-        <tr>
-          <td colspan="7" class="text-center">Cargando datos...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        <?php endif; ?>
+      </tr>
+    </thead>
+    <tbody id="userTableBody">
+      <tr>
+        <td colspan="<?=
+          6 + (
+            (isset($_SESSION['puede_editar_registros']) && $_SESSION['puede_editar_registros']) ||
+            (isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'])
+            ? 1 : 0
+          )
+        ?>" class="text-center">Cargando datos...</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
   <div class="pagination-container d-flex justify-content-end">
     <div id="pagination-controls" class="mt-3"></div>
   </div>

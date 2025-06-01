@@ -122,17 +122,19 @@ data.forEach(user => {
     `;
   }
 
-  row.innerHTML = `
-    <td>${user.apellido_nombre || ''}</td>
-    <td>${user.cuit_dni || ''}</td>
-    <td>${user.razon_social || ''}</td>
-    <td>${user.telefono || ''}</td>
-    <td>${user.correo || ''}</td>
-    <td>${user.rubro || ''}</td>
-    <td>
-      ${actionsHtml}
-    </td>
-  `;
+row.innerHTML = `
+  <td>${user.apellido_nombre || ''}</td>
+  <td>${user.cuit_dni || ''}</td>
+  <td>${user.razon_social || ''}</td>
+  <td>${user.telefono || ''}</td>
+  <td>${user.correo || ''}</td>
+  <td>${user.rubro || ''}</td>
+  ${
+    (puedeEditarRegistros || puedeEliminarRegistros)
+      ? `<td>${actionsHtml}</td>`
+      : ''
+  }
+`;
 
   userTableBody.appendChild(row);
 });
