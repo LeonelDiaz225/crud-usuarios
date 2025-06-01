@@ -7,13 +7,14 @@ Este proyecto es un sistema de gestión de datos multi-entorno que permite:
 - Cargar datos manualmente o importar desde archivos `.csv`.
 - Realizar operaciones CRUD dentro de cada entorno.
 - Control de acceso por usuario y roles (admin y usuarios estándar).
+- Interfaz moderna y minimalista con **paleta oscura** y componentes Bootstrap personalizados.
 
 ---
 
 ## 🛠️ Tecnologías utilizadas
 - PHP (Back-end)
 - MySQL (XAMPP/phpMyAdmin)
-- HTML5 / CSS3
+- HTML5 / CSS3 (con Bootstrap 5, paleta oscura personalizada)
 - JavaScript Vanilla (sin frameworks)
 - Fetch API
 
@@ -35,10 +36,10 @@ crud-usuarios/
 ├── includes/
 │   └── db.php                      # Conexión a la base de datos
 ├── js/
-│   ├── script.js                   # Lógica JS para CRUD y CSV
+│   ├── script.js                   # Lógica JS para CRUD, paginación, permisos y CSV
 │   └── debug.js                    # Herramientas de depuración
 ├── css/
-│   └── style.css                   # Estilos personalizados
+│   └── style.css                   # Estilos personalizados (paleta oscura, tablas, botones, etc.)
 ├── login.php                       # Login de usuarios
 ├── logout.php                      # Cierre de sesión
 ├── hash.php                        # Utilidad para generar hashes de contraseñas
@@ -60,7 +61,7 @@ CREATE TABLE entornos (
 ```
 
 ### 2. Tabla de usuarios
-Ejemplo de estructura para control de acceso:
+Ejemplo de estructura para control de acceso y permisos:
 
 ```sql
 CREATE TABLE usuarios (
@@ -106,7 +107,7 @@ CREATE TABLE nombre_entorno (
 6. Ingresa al entorno para:
    - Cargar datos manualmente.
    - Importar desde `.csv`.
-   - Editar y eliminar registros.
+   - Editar y eliminar registros (según permisos).
 
 ---
 
@@ -125,19 +126,20 @@ Ejemplo Uno,20300123456,Empresa Uno,1122334455,uno@email.com,Comercio
 - [x] Crear entornos con su propia tabla
 - [x] Cargar registros manualmente
 - [x] Importar múltiples registros desde CSV
-- [x] Editar registros (modal o inline)
+- [x] Editar registros (modal)
 - [x] Eliminar registros con confirmación
 - [x] Separación total entre entornos
 - [x] Gestión de roles y permisos
+- [x] Interfaz oscura y minimalista
+- [x] Paginación y buscador en tablas
+- [x] Exportar registros a Excel
 
 ---
 
 ## 💡 Mejoras y recomendaciones
 - Validación y sanitización de datos en frontend y backend
-- Exportación de registros a Excel o CSV
-- Edición en línea sin `prompt()`
-- Buscador por CUIT/DNI o nombre
 - Documentación de endpoints y ejemplos de uso
 - Refactorización para separar lógica y presentación
+- Mejorar la gestión visual de permisos y feedback de usuario
 
 ---
