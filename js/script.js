@@ -467,4 +467,16 @@ if (dropdownItems.length && seleccionadosList && hiddenInputsDiv) {
     });
   }
 }
+
+const sidebar = document.getElementById('sidebar');
+const toggle = document.getElementById('sidebarToggle');
+const overlay = document.getElementById('sidebarOverlay');
+toggle.onclick = () => {
+  sidebar.classList.toggle('active');
+  overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+};
+overlay.onclick = () => {
+  sidebar.classList.remove('active');
+  overlay.style.display = 'none';
+};
 });

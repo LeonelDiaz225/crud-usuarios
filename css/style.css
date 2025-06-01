@@ -443,3 +443,104 @@ action-btn {
   width: auto;
   box-shadow: none;
 }
+
+#sidebar {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 260px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -2px 0 16px rgba(0,0,0,0.12);
+  z-index: 1050;
+  transition: transform 0.3s;
+}
+
+#sidebar.active {
+  display: block;
+}
+
+#sidebarOverlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.2);
+  z-index: 1049;
+}
+
+#sidebar.active + #sidebarOverlay {
+  display: block;
+}
+
+/* Botón hamburguesa */
+#sidebarToggle {
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-btn {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: 2px solid;
+  background-color: transparent !important;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.sidebar-btn-green {
+  color: #219653;
+  border-color: #219653;
+  background: transparent !important;
+}
+
+.sidebar-btn-green:hover {
+  background-color: #219653 !important;
+  color: white !important;
+}
+
+/* Asegurarse que Bootstrap no sobreescriba estos estilos */
+button.sidebar-btn {
+  background: transparent !important;
+}
+
+button.sidebar-btn:hover {
+  background-color: #219653 !important;
+  color: white !important;
+}
+
+.sidebar-btn-red {
+  color: #d32f2f;
+  border-color: #d32f2f;
+}
+.sidebar-btn-red:hover, .sidebar-btn-red:focus {
+  background: #d32f2f;
+  color: #fff;
+}
+
+/* Sobrescribir estilos generales de botón para formularios */
+form button[type="submit"].sidebar-btn {
+  background: transparent !important;
+  border: 2px solid;
+  width: 100%;
+  margin-top: 10px;
+}
+
+form button[type="submit"].sidebar-btn:hover {
+  background: #219653 !important;
+  color: #fff !important;
+}

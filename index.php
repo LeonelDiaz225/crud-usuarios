@@ -53,22 +53,39 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
 </head>
 <body class="bg-light">
 
-<div class="container py-4">
-  <div class="d-flex justify-content-end mb-3">
-    <a href="logout.php" class="btn btn-outline-danger">Cerrar sesión</a>
-  </div>
+<!-- Sidebar derecha -->
+<div id="sidebar" class="sidebar bg-white shadow position-fixed end-0 top-0 vh-100 p-4">
+  <div class="d-flex flex-column h-100">
+    <div class="mb-4">
+      <div class="fw-bold mb-2">👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Usuario') ?></div>
+    </div>
+    <div class="flex-grow-1 d-flex flex-column">
   <?php if (esadmin()) { ?>
-    <form method="post" class="mb-3">
-      <button type="submit" name="mostrar_formulario_usuario" class="btn btn-success w-100">
+    <form method="post" class="mb-2"> <!-- Cambiado de mb-3 a mb-2 -->
+      <button type="submit" name="mostrar_formulario_usuario" class="sidebar-btn sidebar-btn-green">
         <i class="bi bi-person-plus"></i> Crear usuario
       </button>
     </form>
   <?php } ?>
+  <form action="logout.php" method="POST" class="m-0"> <!-- Cambiado de mb-0 a m-0 -->
+    <button type="submit" class="sidebar-btn sidebar-btn-red">
+      <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+    </button>
+  </form>
+</div>
+  </div>
+</div>
+<div id="sidebarOverlay"></div>
+
+<!-- Botón hamburguesa para abrir sidebar -->
+<button id="sidebarToggle" class="btn btn-primary position-fixed" style="top:20px; right:20px; z-index:1100;">
+  <i class="bi bi-list" style="font-size:1.5rem;"></i>
+</button>
 
  <?php if (esadmin() && isset($_POST['mostrar_formulario_usuario'])) { ?>
   <div class="row justify-content-center">
     <div class="col-12 col-md-6">
-      <div class="card shadow-sm mb-4">
+      <div class="card shadow-sm mb-4 card-no-bg">
         <div class="card-body">
           <h2 class="card-title mb-4 text-center">Crear usuario</h2>
 <form method="post">
@@ -139,7 +156,7 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
     </div>
   </div>
   <div id="entornosHiddenInputs"></div>
-  <button type="submit" name="crear_usuario" class="btn btn-success w-100 mt-2">
+  <button type="submit" name="crear_usuario" class="sidebar-btn sidebar-btn-green mt-2">
     <i class="bi bi-person-plus"></i> Crear usuario
   </button>
 </form>
