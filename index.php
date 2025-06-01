@@ -60,11 +60,9 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
     <div class="flex-grow-1 d-flex flex-column">
       <div class="d-grid gap-3">
         <?php if (esadmin()) { ?>
-        <form method="post" class="m-0">
-          <button type="submit" name="mostrar_formulario_usuario" class="sidebar-btn sidebar-btn-green">
+          <button type="button" class="sidebar-btn sidebar-btn-green" data-bs-toggle="modal" data-bs-target="#crearUsuarioModal">
             <i class="bi bi-person-plus me-2"></i> Crear usuario
           </button>
-        </form>
         <?php } ?>
         <form action="logout.php" method="POST" class="m-0">
           <button type="submit" class="sidebar-btn sidebar-btn-red">
@@ -81,87 +79,91 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
   <i class="bi bi-list" style="font-size:1.5rem;"></i>
 </button>
 
-<?php if (esadmin() && isset($_POST['mostrar_formulario_usuario'])) { ?>
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-8 col-lg-6">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <h2 class="card-title mb-4 text-center">Crear usuario</h2>
-          <form method="post">
-            <div class="row">
-              <div class="col-12 col-md-6 mb-3">
-                <input type="text" name="username" class="form-control" placeholder="Nombre usuario" required>
-              </div>
-              <div class="col-12 col-md-6 mb-3">
-                <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
-              </div>
-              <div class="col-12 mb-3">
-                <select name="rol" class="form-select">
-                  <option value="user">Usuario</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-2 fw-bold">Otorgar permisos</div>
-            <div class="row mb-3">
-              <div class="col-12 col-md-6">
-                <div class="form-check mb-2">
-                  <input type="checkbox" class="form-check-input" name="puede_crear_entorno" id="crearEntorno">
-                  <label class="form-check-label" for="crearEntorno">Crear entornos</label>
-                </div>
-                <div class="form-check mb-2">
-                  <input type="checkbox" class="form-check-input" name="puede_eliminar_entorno" id="eliminarEntorno">
-                  <label class="form-check-label" for="eliminarEntorno">Eliminar entornos</label>
-                </div>
-                <div class="form-check mb-2">
-                  <input type="checkbox" class="form-check-input" name="puede_editar_entorno" id="editarEntorno">
-                  <label class="form-check-label" for="editarEntorno">Editar entornos</label>
-                </div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="form-check mb-2">
-                  <input type="checkbox" class="form-check-input" name="puede_editar_registros" id="editarRegistros">
-                  <label class="form-check-label" for="editarRegistros">Editar registros</label>
-                </div>
-                <div class="form-check mb-2">
-                  <input type="checkbox" class="form-check-input" name="puede_eliminar_registros" id="eliminarRegistros">
-                  <label class="form-check-label" for="eliminarRegistros">Eliminar registros</label>
-                </div>
-              </div>
-            </div>
-            <div class="mb-3">
-              <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="dropdownEntornos" data-bs-toggle="dropdown" aria-expanded="false">
-                  Seleccionar entornos
-                </button>
-                <ul class="dropdown-menu w-100" aria-labelledby="dropdownEntornos" id="entornosDropdownList">
-                  <?php
-                  $entornos_result = $conn->query("SELECT nombre FROM entornos ORDER BY nombre ASC");
-                  while ($ent = $entornos_result->fetch_assoc()):
-                  ?>
-                    <li>
-                      <a class="dropdown-item entorno-item" href="#" data-nombre="<?= htmlspecialchars($ent['nombre']) ?>">
-                        <?= htmlspecialchars($ent['nombre']) ?>
-                      </a>
-                    </li>
-                  <?php endwhile; ?>
-                </ul>
-              </div>
-              <div class="mt-3">
-                <div class="fw-bold mb-1">Seleccionados:</div>
-                <ul id="entornosSeleccionados" class="list-group"></ul>
-              </div>
-            </div>
-            <div id="entornosHiddenInputs"></div>
-            <button type="submit" name="crear_usuario" class="sidebar-btn sidebar-btn-green mt-2 w-100">
-              <i class="bi bi-person-plus"></i> Crear usuario
-            </button>
-          </form>
+<!-- Modal de creación de usuario -->
+<div class="modal fade" id="crearUsuarioModal" tabindex="-1" aria-labelledby="crearUsuarioModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="crearUsuarioModalLabel">Crear usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-      </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-12 col-md-6 mb-3">
+              <input type="text" name="username" class="form-control" placeholder="Nombre usuario" required>
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+              <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
+            </div>
+            <div class="col-12 mb-3">
+              <select name="rol" class="form-select">
+                <option value="user">Usuario</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-2 fw-bold">Otorgar permisos</div>
+          <div class="row mb-3">
+            <div class="col-12 col-md-6">
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" name="puede_crear_entorno" id="crearEntorno">
+                <label class="form-check-label" for="crearEntorno">Crear entornos</label>
+              </div>
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" name="puede_eliminar_entorno" id="eliminarEntorno">
+                <label class="form-check-label" for="eliminarEntorno">Eliminar entornos</label>
+              </div>
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" name="puede_editar_entorno" id="editarEntorno">
+                <label class="form-check-label" for="editarEntorno">Editar entornos</label>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" name="puede_editar_registros" id="editarRegistros">
+                <label class="form-check-label" for="editarRegistros">Editar registros</label>
+              </div>
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" name="puede_eliminar_registros" id="eliminarRegistros">
+                <label class="form-check-label" for="eliminarRegistros">Eliminar registros</label>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="dropdownEntornos" data-bs-toggle="dropdown" aria-expanded="false">
+                Seleccionar entornos
+              </button>
+              <ul class="dropdown-menu w-100" aria-labelledby="dropdownEntornos" id="entornosDropdownList">
+                <?php
+                $entornos_result = $conn->query("SELECT nombre FROM entornos ORDER BY nombre ASC");
+                while ($ent = $entornos_result->fetch_assoc()):
+                ?>
+                  <li>
+                    <a class="dropdown-item entorno-item" href="#" data-nombre="<?= htmlspecialchars($ent['nombre']) ?>">
+                      <?= htmlspecialchars($ent['nombre']) ?>
+                    </a>
+                  </li>
+                <?php endwhile; ?>
+              </ul>
+            </div>
+            <div class="mt-3">
+              <div class="fw-bold mb-1">Seleccionados:</div>
+              <ul id="entornosSeleccionados" class="list-group"></ul>
+            </div>
+          </div>
+          <div id="entornosHiddenInputs"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" name="crear_usuario" class="btn btn-success w-100">
+            <i class="bi bi-person-plus"></i> Crear usuario
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-<?php } ?>
+</div>
 
 <h1 class="text-center my-4">Gestión de Entornos</h1>
 
