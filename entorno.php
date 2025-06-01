@@ -131,7 +131,7 @@ if (
           <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i> Importar CSV</button>
         </div>
       </form>
-      <p class="text-muted mt-2 mb-0" style="font-size: 0.95em;">
+      <p class="mt-2 mb-0" style="font-size: 0.95em; color: #ffc107;">
         El CSV debe tener los campos: Apellido y Nombre, CUIT/DNI, Razón Social, Teléfono, Correo, Rubro.
       </p>
     </div>
