@@ -260,27 +260,26 @@ function handleEdit() {
 
   // Manejador para el botón de eliminar
   function handleDelete() {
-    const tr = this.closest("tr");
-    const id = tr.dataset.id;
+  const tr = this.closest("tr");
+  const id = tr.dataset.id;
 
-    if (confirm("¿Seguro que desea eliminar este registro?")) {
-      fetch(`environments/delete_from_environment.php?tabla=${tabla}&id=${id}`)
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`Error HTTP: ${res.status}`);
-          }
-          return res.text();
-        })
-        .then(msg => {
-          alert(msg);
-          loadUsers(); // Recargar la tabla
-        })
-        .catch(error => {
-          console.error("Error al eliminar:", error);
-          alert("Error al eliminar: " + error.message);
-        });
-    }
+  if (confirm("¿Seguro que desea eliminar este registro?")) {
+    fetch(`environments/delete_from_environment.php?tabla=${tabla}&id=${id}`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
+        return res.text();
+      })
+      .then(msg => {
+        showFloatingMessage(msg); // Mostrar mensaje flotante
+        loadUsers(); // Recargar la tabla inmediatamente
+      })
+      .catch(error => {
+        showFloatingMessage("Error al eliminar: " + error.message, true);
+      });
   }
+}
 
   // Manejador para el botón de editar (abre el modal y rellena los campos)
   function handleEdit() {
@@ -336,11 +335,11 @@ if (editForm) {
         if (modalInstance) {
           modalInstance.hide();
         }
-        alert(msg);
+        showFloatingMessage(msg);
         loadUsers();
       })
       .catch(error => {
-        alert("Error al actualizar: " + error.message);
+        showFloatingMessage("Error al actualizar: " + error.message, true);
       });
   };
 }
@@ -354,43 +353,36 @@ if (editForm) {
   }
 
   // Configurar el formulario de importación CSV si existe
-  if (csvForm && csvFile) {
-    console.log("Configurando formulario CSV");
-    
-    csvForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-      console.log("Formulario CSV enviado");
-      
-      const file = csvFile.files[0];
-      if (!file) {
-        alert("Por favor, seleccione un archivo .CSV");
-        return;
-      }
+if (csvForm && csvFile) {
+  csvForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const file = csvFile.files[0];
+    if (!file) {
+      showFloatingMessage("Por favor, seleccione un archivo .CSV", true);
+      return;
+    }
+    const formData = new FormData(csvForm);
 
-      console.log("Archivo seleccionado:", file.name);
-      const formData = new FormData(csvForm);
-
-      fetch(`environments/import_csv_to_environment.php?tabla=${tabla}`, {
-        method: "POST",
-        body: formData
+    fetch(`environments/import_csv_to_environment.php?tabla=${tabla}`, {
+      method: "POST",
+      body: formData
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
+        return res.text();
       })
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`Error HTTP: ${res.status}`);
-          }
-          return res.text();
-        })
-        .then(msg => {
-          alert(msg);
-          csvForm.reset();
-          loadUsers(); // Recargar datos después de importar
-        })
-        .catch(err => {
-          console.error("Error al importar CSV:", err);
-          alert("Error al importar el CSV: " + err.message);
-        });
-    });
-  } else {
+      .then(msg => {
+        showFloatingMessage(msg);
+        csvForm.reset();
+        loadUsers(); // Recargar datos después de importar
+      })
+      .catch(err => {
+        showFloatingMessage("Error al importar el CSV: " + err.message, true);
+      });
+  });
+} else {
     console.warn("No se encontró el formulario CSV");
   }
 
@@ -505,14 +497,37 @@ overlay.onclick = () => {
   overlay.style.display = 'none';
 };
 
-  // Ocultar la alerta después de 3 segundos
-  document.addEventListener('DOMContentLoaded', function() {
-    const alert = document.getElementById('mensaje-alert');
-    if (alert) {
-      setTimeout(() => {
-        alert.classList.add('fade');
-        setTimeout(() => alert.remove(), 500); // Espera la animación fade
-      }, 3000);
-    }
-  });
+function showFloatingMessage(msg, isError = false) {
+  let alertDiv = document.createElement('div');
+  alertDiv.className = "mensaje-alert";
+  alertDiv.style.position = "fixed";
+  alertDiv.style.top = "20px";
+  alertDiv.style.right = "20px";
+  alertDiv.style.zIndex = "9999";
+  alertDiv.style.background = isError ? "#dc3545" : "#198754";
+  alertDiv.style.color = "#fff";
+  alertDiv.style.padding = "12px 24px";
+  alertDiv.style.borderRadius = "6px";
+  alertDiv.style.boxShadow = "0 2px 8px #0002";
+  alertDiv.textContent = msg;
+  document.body.appendChild(alertDiv);
+  setTimeout(() => {
+    alertDiv.style.transition = "opacity 0.5s";
+    alertDiv.style.opacity = 0;
+    setTimeout(() => {
+      if (alertDiv.parentNode) alertDiv.parentNode.removeChild(alertDiv);
+    }, 500);
+  }, 3000);
+}
+
+// Ocultar todas las alertas flotantes (PHP o JS) después de 3 segundos
+document.querySelectorAll('.mensaje-alert').forEach(alertDiv => {
+  setTimeout(() => {
+    alertDiv.style.transition = "opacity 0.5s";
+    alertDiv.style.opacity = 0;
+    setTimeout(() => {
+      if (alertDiv.parentNode) alertDiv.parentNode.removeChild(alertDiv);
+    }, 500);
+  }, 3000);
+});
 });

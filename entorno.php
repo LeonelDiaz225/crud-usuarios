@@ -45,9 +45,11 @@ if (
   );
   
   if ($stmt->execute()) {
-    $mensaje = "Registro guardado correctamente.";
+    header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Registro guardado correctamente."));
+    exit;
   } else {
-    $mensaje = "Error al guardar: " . $conn->error;
+    header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Error al guardar: " . $conn->error));
+    exit;
   }
 }
 ?>
@@ -70,8 +72,11 @@ if (
   </div>
   <a href="index.php" class="btn btn-link mb-3 px-0 text-light"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
 
-<?php if (isset($mensaje)): ?>
-  <div class="alert alert-info" id="mensaje-alert"><?= htmlspecialchars($mensaje) ?></div>
+
+<?php if (isset($_GET['mensaje'])): ?>
+  <div class="mensaje-alert" style="position:fixed;top:20px;right:20px;z-index:9999;background:#198754;color:#fff;padding:12px 24px;border-radius:6px;box-shadow:0 2px 8px #0002;">
+    <?= htmlspecialchars($_GET['mensaje']) ?>
+  </div>
 <?php endif; ?>
 
   <!-- Formulario manual -->
