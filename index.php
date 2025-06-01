@@ -60,24 +60,26 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
       <div class="fw-bold mb-2">👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Usuario') ?></div>
     </div>
     <div class="flex-grow-1 d-flex flex-column">
-  <?php if (esadmin()) { ?>
-    <form method="post" class="mb-2"> <!-- Cambiado de mb-3 a mb-2 -->
-      <button type="submit" name="mostrar_formulario_usuario" class="sidebar-btn sidebar-btn-green">
-        <i class="bi bi-person-plus"></i> Crear usuario
-      </button>
-    </form>
-  <?php } ?>
-  <form action="logout.php" method="POST" class="m-0"> <!-- Cambiado de mb-0 a m-0 -->
-    <button type="submit" class="sidebar-btn sidebar-btn-red">
-      <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-    </button>
-  </form>
-</div>
+      <div class="d-grid gap-3">
+        <?php if (esadmin()) { ?>
+        <form method="post" class="m-0">
+          <button type="submit" name="mostrar_formulario_usuario" class="sidebar-btn sidebar-btn-green">
+            <i class="bi bi-person-plus me-2"></i> Crear usuario
+          </button>
+        </form>
+        <?php } ?>
+        <form action="logout.php" method="POST" class="m-0">
+          <button type="submit" class="sidebar-btn sidebar-btn-red">
+            <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 <div id="sidebarOverlay"></div>
 
-<!-- Botón hamburguesa para abrir sidebar -->
+
 <button id="sidebarToggle" class="btn btn-primary position-fixed" style="top:20px; right:20px; z-index:1100;">
   <i class="bi bi-list" style="font-size:1.5rem;"></i>
 </button>

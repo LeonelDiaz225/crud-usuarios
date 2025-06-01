@@ -513,23 +513,17 @@ action-btn {
   color: white !important;
 }
 
-/* Asegurarse que Bootstrap no sobreescriba estos estilos */
-button.sidebar-btn {
-  background: transparent !important;
-}
-
-button.sidebar-btn:hover {
-  background-color: #219653 !important;
-  color: white !important;
-}
 
 .sidebar-btn-red {
   color: #d32f2f;
   border-color: #d32f2f;
+  background: transparent  !important;
 }
-.sidebar-btn-red:hover, .sidebar-btn-red:focus {
-  background: #d32f2f;
-  color: #fff;
+
+.sidebar-btn-red:hover {
+  background-color: #d32f2f !important;
+  color: #fff !important;
+  border-color: #d32f2f !important;
 }
 
 /* Sobrescribir estilos generales de botón para formularios */
@@ -540,7 +534,14 @@ form button[type="submit"].sidebar-btn {
   margin-top: 10px;
 }
 
-form button[type="submit"].sidebar-btn:hover {
+form button[type="submit"].sidebar-btn.sidebar-btn-green:hover {
   background: #219653 !important;
   color: #fff !important;
 }
+
+form button[type="submit"].sidebar-btn.sidebar-btn-red:hover {
+  background: #d32f2f !important;
+  color: #fff !important;
+  border-color: #d32f2f !important;
+}
+
