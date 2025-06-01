@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
@@ -11,19 +12,19 @@ include "includes/db.php";
 // Validar el nombre de la tabla
 $tabla = preg_replace('/[^a-zA-Z0-9_]/', '', $_GET['tabla'] ?? '');
 if (!$tabla) {
-  die("<p>Error: Entorno no válido.</p><a href='index.php'>Volver a entornos</a>");
+  die("<div class='container my-5'><div class='alert alert-danger'>Error: Entorno no válido.</div><a href='index.php' class='btn btn-link'><i class='bi bi-arrow-left'></i> Volver a entornos</a></div>");
 }
 
 $entornos_asignados = isset($_SESSION['entornos_asignados']) ? explode(',', $_SESSION['entornos_asignados']) : [];
 if ($_SESSION['rol'] !== 'admin' && !in_array($tabla, $entornos_asignados)) {
-    echo "<p>No tienes acceso a este entorno.</p>";
+    echo "<div class='container my-5'><div class='alert alert-danger'>No tienes acceso a este entorno.</div></div>";
     exit;
 }
 
 // Verificar si la tabla existe
 $tableCheck = $conn->query("SHOW TABLES LIKE '$tabla'");
 if ($tableCheck->num_rows === 0) {
-  die("<p>Error: La tabla '$tabla' no existe.</p><a href='index.php'>Volver a entornos</a>");
+  die("<div class='container my-5'><div class='alert alert-danger'>Error: La tabla '$tabla' no existe.</div><a href='index.php' class='btn btn-link'><i class='bi bi-arrow-left'></i> Volver a entornos</a></div>");
 }
 
 // Guardar manualmente si es un formulario de carga manual (no CSV)
@@ -48,13 +49,8 @@ if (
   } else {
     $mensaje = "Error al guardar: " . $conn->error;
   }
-  
-  // No redireccionamos para poder ver el mensaje
-  // header("Location: entorno.php?tabla=$tabla");
-  // exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -65,114 +61,144 @@ if (
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body>
+<body class="bg-light">
 
-<div class="d-flex justify-content-end mb-3">
-    <a href="logout.php" class="btn btn-outline-danger">Cerrar sesión</a>
+<div class="container my-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Entorno: <?= htmlspecialchars($tabla) ?></h1>
+    <a href="logout.php" class="btn btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
   </div>
+  <a href="index.php" class="btn btn-link mb-3 px-0"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
 
-  <h1>Entorno: <?= htmlspecialchars($tabla) ?></h1>
-  <a href="index.php" class="back-index">← Volver a entornos</a>
-  
-  <?php if (isset($mensaje)): ?>
-    <div style="margin: 10px 0; padding: 10px; background-color: #f0f0f0; border-left: 4px solid #4CAF50;">
-      <?= $mensaje ?>
-    </div>
-  <?php endif; ?>
+<?php if (isset($mensaje)): ?>
+  <div class="alert alert-info" id="mensaje-alert"><?= htmlspecialchars($mensaje) ?></div>
+<?php endif; ?>
 
-  <h2 style="text-align: center">Agregar registro manualmente</h2>
-  <form method="POST" autocomplete="off">
-    <input type="text" name="apellido_nombre" placeholder="Apellido y Nombre" required>
-    <input type="text" name="cuit_dni" placeholder="CUIT o DNI" required>
-    <input type="text" name="razon_social" placeholder="Razón Social" required>
-    <input type="text" name="telefono" placeholder="Teléfono" required>
-    <input type="email" name="correo" placeholder="Correo Electrónico" required>
-    <input type="text" name="rubro" placeholder="Rubro" required>
-    <button type="submit">Guardar</button>
-  </form>
-
-  <!-- Formulario para CSV -->
-  <h2 style="text-align: center">Importar CSV</h2>
-  <form id="csvForm" action="environments/import_csv_to_environment.php?tabla=<?= htmlspecialchars($tabla) ?>" method="POST" enctype="multipart/form-data">
-    <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
-    <input type="hidden" name="tabla" value="<?= htmlspecialchars($tabla) ?>">
-    <button type="submit">Importar CSV</button>
-  </form>
-  
-  <p style="text-align: center; font-size: 0.9em; color: #666;">
-    El CSV debe tener los campos: Apellido y Nombre, CUIT/DNI, Razón Social, Teléfono, Correo, Rubro.
-  </p>
-
-  <h2 style="text-align: center">Registros en <?= htmlspecialchars($tabla) ?></h2>
-
-  
-<div class="search-container">
-  <input type="text" id="buscadorGeneral" placeholder="Buscar registros...">
-</div>
-
-<!-- Exportar a Excel -->
-<div class="exportar-container">
-  <button id="exportExcelBtn" class="btn btn-success btn-sm exportar-btn">
-    <i class="bi bi-file-earmark-excel"></i> Exportar
-  </button>
-</div>
-
-  <!-- Tabla de registros -->
-  <table>
-    <thead>
-      <tr>
-        <th>Apellido y Nombre</th>
-        <th>CUIT o DNI</th>
-        <th>Razón Social</th>
-        <th>Teléfono</th>
-        <th>Correo</th>
-        <th>Rubro</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody id="userTableBody">
-      <!-- Los datos se cargarán dinámicamente con JavaScript -->
-      <tr>
-        <td colspan="7" style="text-align: center">Cargando datos...</td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="pagination-container" style="display: flex; justify-content: flex-end; width: 100%;">
-    <div id="pagination-controls" style="text-align: center; margin-top: 20px;">
-      <!-- Los controles de paginación se cargarán aquí -->
-    </div>
-  </div>
-
-  
-  <!-- Modal de edición -->
-  <div id="editModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close" id="closeEditModal">&times;</span>
-      <h2>Editar registro</h2>
-      <form id="editForm" autocomplete="off">
-        <input type="hidden" name="id" id="edit_id">
-        <input type="hidden" name="tabla" id="edit_tabla" value="<?= htmlspecialchars($tabla) ?>">
-        <input type="text" name="apellido_nombre" id="edit_apellido_nombre" placeholder="Apellido y Nombre" required>
-        <input type="text" name="cuit_dni" id="edit_cuit_dni" placeholder="CUIT o DNI" required>
-        <input type="text" name="razon_social" id="edit_razon_social" placeholder="Razón Social" required>
-        <input type="text" name="telefono" id="edit_telefono" placeholder="Teléfono" required>
-        <input type="email" name="correo" id="edit_correo" placeholder="Correo Electrónico" required>
-        <input type="text" name="rubro" id="edit_rubro" placeholder="Rubro" required>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <button type="submit" id="editSaveBtn">Aceptar cambios</button>
-          <button type="button" id="editCancelBtn" style="background:#f44336;">Cancelar</button>
+  <!-- Formulario manual -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title text-center mb-3">Agregar registro manualmente</h5>
+      <form method="POST" autocomplete="off" class="row g-3">
+        <div class="col-md-6">
+          <input type="text" name="apellido_nombre" class="form-control" placeholder="Apellido y Nombre" required>
+        </div>
+        <div class="col-md-6">
+          <input type="text" name="cuit_dni" class="form-control" placeholder="CUIT o DNI" required>
+        </div>
+        <div class="col-md-6">
+          <input type="text" name="razon_social" class="form-control" placeholder="Razón Social" required>
+        </div>
+        <div class="col-md-6">
+          <input type="text" name="telefono" class="form-control" placeholder="Teléfono" required>
+        </div>
+        <div class="col-md-6">
+          <input type="email" name="correo" class="form-control" placeholder="Correo Electrónico" required>
+        </div>
+        <div class="col-md-6">
+          <input type="text" name="rubro" class="form-control" placeholder="Rubro" required>
+        </div>
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar</button>
         </div>
       </form>
     </div>
   </div>
-  <script>
-    const puedeEditarRegistros = <?= isset($_SESSION['puede_editar_registros']) && $_SESSION['puede_editar_registros'] ? 'true' : 'false' ?>;
-    const puedeEliminarRegistros = <?= isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'] ? 'true' : 'false' ?>;
-    const tabla = "<?= htmlspecialchars($tabla) ?>"; // Aseguramos que la variable tabla también esté disponible globalmente
-  </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/script.js"></script>
- 
+  <!-- Formulario CSV -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title text-center mb-3">Importar CSV</h5>
+      <form id="csvForm" action="environments/import_csv_to_environment.php?tabla=<?= htmlspecialchars($tabla) ?>" method="POST" enctype="multipart/form-data" class="row g-3 align-items-center">
+        <div class="col-md-8">
+          <input type="file" id="csvFile" name="csvFile" accept=".csv" class="form-control" required>
+          <input type="hidden" name="tabla" value="<?= htmlspecialchars($tabla) ?>">
+        </div>
+        <div class="col-md-4 text-end">
+          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i> Importar CSV</button>
+        </div>
+      </form>
+      <p class="text-muted mt-2 mb-0" style="font-size: 0.95em;">
+        El CSV debe tener los campos: Apellido y Nombre, CUIT/DNI, Razón Social, Teléfono, Correo, Rubro.
+      </p>
+    </div>
+  </div>
+
+  <!-- Buscador y exportar -->
+  <div class="row mb-3">
+    <div class="col-md-6 mb-2">
+      <input type="text" id="buscadorGeneral" class="form-control" placeholder="Buscar registros...">
+    </div>
+    <div class="col-md-6 text-end">
+      <button id="exportExcelBtn" class="btn btn-success exportar-btn">
+        <i class="bi bi-file-earmark-excel"></i> Exportar
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de registros -->
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-success">
+        <tr>
+          <th>Apellido y Nombre</th>
+          <th>CUIT o DNI</th>
+          <th>Razón Social</th>
+          <th>Teléfono</th>
+          <th>Correo</th>
+          <th>Rubro</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <tr>
+          <td colspan="7" class="text-center">Cargando datos...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination-container d-flex justify-content-end">
+    <div id="pagination-controls" class="mt-3"></div>
+  </div>
+</div>
+
+<!-- Modal de edición Bootstrap -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editForm" autocomplete="off">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Editar registro</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="edit_id">
+          <input type="hidden" name="tabla" id="edit_tabla" value="<?= htmlspecialchars($tabla) ?>">
+          <div class="mb-2">
+            <input type="text" name="apellido_nombre" id="edit_apellido_nombre" class="form-control mb-2" placeholder="Apellido y Nombre" required>
+            <input type="text" name="cuit_dni" id="edit_cuit_dni" class="form-control mb-2" placeholder="CUIT o DNI" required>
+            <input type="text" name="razon_social" id="edit_razon_social" class="form-control mb-2" placeholder="Razón Social" required>
+            <input type="text" name="telefono" id="edit_telefono" class="form-control mb-2" placeholder="Teléfono" required>
+            <input type="email" name="correo" id="edit_correo" class="form-control mb-2" placeholder="Correo Electrónico" required>
+            <input type="text" name="rubro" id="edit_rubro" class="form-control mb-2" placeholder="Rubro" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="editSaveBtn" class="btn btn-success">Aceptar cambios</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const puedeEditarRegistros = <?= isset($_SESSION['puede_editar_registros']) && $_SESSION['puede_editar_registros'] ? 'true' : 'false' ?>;
+  const puedeEliminarRegistros = <?= isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'] ? 'true' : 'false' ?>;
+  const tabla = "<?= htmlspecialchars($tabla) ?>";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>

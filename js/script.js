@@ -89,33 +89,53 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        data.forEach(user => {
-          const row = document.createElement("tr");
-          row.setAttribute("data-id", user.id);
+data.forEach(user => {
+  const row = document.createElement("tr");
+  row.setAttribute("data-id", user.id);
 
-          // Creamos el contenido HTML de la fila
-          let actionsHtml = '';
-          if (puedeEditarRegistros) {
-            actionsHtml += '<button class="edit-btn">Editar</button>';
-          }
-          if (puedeEliminarRegistros) {
-            actionsHtml += ' <button class="delete-btn">Eliminar</button>';
-          }
+  // Creamos el contenido HTML de la fila
+  let actionsHtml = '';
+  if (puedeEditarRegistros) {
+    actionsHtml += `
+      <button 
+        type="button"
+        class="btn btn-warning btn-sm edit-btn"
+        data-id="${user.id}"
+        data-apellido_nombre="${user.apellido_nombre || ''}"
+        data-cuit_dni="${user.cuit_dni || ''}"
+        data-razon_social="${user.razon_social || ''}"
+        data-telefono="${user.telefono || ''}"
+        data-correo="${user.correo || ''}"
+        data-rubro="${user.rubro || ''}"
+        data-bs-toggle="modal"
+        data-bs-target="#editModal"
+      >
+        <i class="bi bi-pencil"></i> Editar
+      </button>
+    `;
+  }
+  if (puedeEliminarRegistros) {
+    actionsHtml += `
+      <button type="button" class="btn btn-danger btn-sm delete-btn">
+        <i class="bi bi-trash"></i> Eliminar
+      </button>
+    `;
+  }
 
-          row.innerHTML = `
-            <td>${user.apellido_nombre || ''}</td>
-            <td>${user.cuit_dni || ''}</td>
-            <td>${user.razon_social || ''}</td>
-            <td>${user.telefono || ''}</td>
-            <td>${user.correo || ''}</td>
-            <td>${user.rubro || ''}</td>
-            <td>
-              ${actionsHtml}
-            </td>
-          `;
+  row.innerHTML = `
+    <td>${user.apellido_nombre || ''}</td>
+    <td>${user.cuit_dni || ''}</td>
+    <td>${user.razon_social || ''}</td>
+    <td>${user.telefono || ''}</td>
+    <td>${user.correo || ''}</td>
+    <td>${user.rubro || ''}</td>
+    <td>
+      ${actionsHtml}
+    </td>
+  `;
 
-          userTableBody.appendChild(row);
-        });
+  userTableBody.appendChild(row);
+});
 
         // Activamos los botones de edición y eliminación
         activarBotones();
@@ -208,21 +228,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function activarBotones() {
-    if (!userTableBody) return;
-    
-    // Activar botones de eliminación
-    document.querySelectorAll(".delete-btn").forEach(btn => {
-      btn.removeEventListener("click", handleDelete); // Evitar duplicados
-      btn.addEventListener("click", handleDelete);
-    });
+function activarBotones() {
+  if (!userTableBody) return;
 
-    // Activar botones de edición
-    document.querySelectorAll(".edit-btn").forEach(btn => {
-      btn.removeEventListener("click", handleEdit); // Evitar duplicados
-      btn.addEventListener("click", handleEdit);
-    });
-  }
+  // Activar botones de eliminación
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.removeEventListener("click", handleDelete); // Evitar duplicados
+    btn.addEventListener("click", handleDelete);
+  });
+
+  // Activar botones de edición
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.removeEventListener("click", handleEdit); // Evitar duplicados
+    btn.addEventListener("click", handleEdit);
+  });
+}
+
+// Nuevo handler para editar usando los atributos data-*
+function handleEdit() {
+  document.getElementById("edit_id").value = this.getAttribute("data-id");
+  document.getElementById("edit_apellido_nombre").value = this.getAttribute("data-apellido_nombre");
+  document.getElementById("edit_cuit_dni").value = this.getAttribute("data-cuit_dni");
+  document.getElementById("edit_razon_social").value = this.getAttribute("data-razon_social");
+  document.getElementById("edit_telefono").value = this.getAttribute("data-telefono");
+  document.getElementById("edit_correo").value = this.getAttribute("data-correo");
+  document.getElementById("edit_rubro").value = this.getAttribute("data-rubro");
+  // El modal se abre automáticamente por Bootstrap con data-bs-toggle/data-bs-target
+}
 
   // Manejador para el botón de eliminar
   function handleDelete() {
@@ -281,44 +313,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 100);
   }
 
-  // Cerrar modal con la X
-  if (closeEditModal) {
-    closeEditModal.onclick = () => { editModal.style.display = "none"; };
-  }
-  // Cerrar modal con el botón cancelar
-  if (editCancelBtn) {
-    editCancelBtn.onclick = () => { editModal.style.display = "none"; };
-  }
-  // Cerrar modal haciendo click fuera del contenido
-  window.onclick = function(event) {
-    if (event.target === editModal) {
-      editModal.style.display = "none";
-    }
-  };
+ 
 
   // Manejar el envío del formulario de edición
-  if (editForm) {
-    editForm.onsubmit = function(e) {
-      e.preventDefault();
-      const formData = new FormData(editForm);
-      fetch("environments/update_from_environment.php", {
-        method: "POST",
-        body: formData
+if (editForm) {
+  editForm.onsubmit = function(e) {
+    e.preventDefault();
+    const formData = new FormData(editForm);
+    fetch("environments/update_from_environment.php", {
+      method: "POST",
+      body: formData
+    })
+      .then(res => {
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+        return res.text();
       })
-        .then(res => {
-          if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-          return res.text();
-        })
-        .then(msg => {
-          editModal.style.display = "none";
-          alert(msg);
-          loadUsers();
-        })
-        .catch(error => {
-          alert("Error al actualizar: " + error.message);
-        });
-    };
-  }
+      .then(msg => {
+        // Cerrar el modal correctamente con Bootstrap 5
+        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+        alert(msg);
+        loadUsers();
+      })
+      .catch(error => {
+        alert("Error al actualizar: " + error.message);
+      });
+  };
+}
 
   // Iniciar carga de datos si estamos en la página correcta
   if (tabla && userTableBody) {
@@ -479,4 +502,15 @@ overlay.onclick = () => {
   sidebar.classList.remove('active');
   overlay.style.display = 'none';
 };
+
+  // Ocultar la alerta después de 3 segundos
+  document.addEventListener('DOMContentLoaded', function() {
+    const alert = document.getElementById('mensaje-alert');
+    if (alert) {
+      setTimeout(() => {
+        alert.classList.add('fade');
+        setTimeout(() => alert.remove(), 500); // Espera la animación fade
+      }, 3000);
+    }
+  });
 });

@@ -1,20 +1,18 @@
 <?php
 session_start();
 function esadmin() {
-  return isset($_SESSION['rol'], $_SESSION['puede_crear_entorno'], $_SESSION['puede_eliminar_entorno'], $_SESSION['puede_editar_entorno'])
-      && $_SESSION['rol'] === 'admin'
-      && $_SESSION['puede_crear_entorno']
-      && $_SESSION['puede_eliminar_entorno']
-      && $_SESSION['puede_editar_entorno'];
+  return isset($_SESSION['rol']) && $_SESSION['rol'] === 'admin'
+      && isset($_SESSION['puede_crear_entorno']) && $_SESSION['puede_crear_entorno']
+      && isset($_SESSION['puede_eliminar_entorno']) && $_SESSION['puede_eliminar_entorno']
+      && isset($_SESSION['puede_editar_entorno']) && $_SESSION['puede_editar_entorno'];
 }
-
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit;
 }
 include "includes/db.php";
- 
+
 if (esadmin() && isset($_POST['crear_usuario'])) {
   $username = trim($_POST['username'] ?? '');
   $password = $_POST['password'] ?? '';
@@ -24,18 +22,18 @@ if (esadmin() && isset($_POST['crear_usuario'])) {
   $puede_editar_entorno = isset($_POST['puede_editar_entorno']) ? 1 : 0;
   $puede_editar_registros = isset($_POST['puede_editar_registros']) ? 1 : 0;
   $puede_eliminar_registros = isset($_POST['puede_eliminar_registros']) ? 1 : 0;
-  $entornos_asignados = isset($_POST['entornos_asignados']) ? implode(',', $_POST['entornos_asignados']) : '';
+  $entornos_asignados = isset($_POST['entornos_asignados']) && is_array($_POST['entornos_asignados']) ? implode(',', $_POST['entornos_asignados']) : '';
   if ($username && $password) {
       $hash = password_hash($password, PASSWORD_DEFAULT);
       $stmt = $conn->prepare("INSERT INTO usuarios (username, password, rol, puede_crear_entorno, puede_eliminar_entorno, puede_editar_entorno, puede_editar_registros, puede_eliminar_registros, entornos_asignados) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
       $stmt->bind_param("sssiiiiis", $username, $hash, $rol, $puede_crear_entorno, $puede_eliminar_entorno, $puede_editar_entorno, $puede_editar_registros, $puede_eliminar_registros, $entornos_asignados);
       if ($stmt->execute()) {
-          echo "<div style='color:green;'>Usuario creado correctamente.</div>";
+          echo "<div class='alert alert-success text-center'>Usuario creado correctamente.</div>";
       } else {
-          echo "<div style='color:red;'>Error al crear usuario: ".$conn->error."</div>";
+          echo "<div class='alert alert-danger text-center'>Error al crear usuario: ".$conn->error."</div>";
       }
   } else {
-      echo "<div style='color:red;'>Usuario y contraseña obligatorios.</div>";
+      echo "<div class='alert alert-danger text-center'>Usuario y contraseña obligatorios.</div>";
   }
 }
 $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
@@ -57,7 +55,7 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
 <div id="sidebar" class="sidebar bg-white shadow position-fixed end-0 top-0 vh-100 p-4">
   <div class="d-flex flex-column h-100">
     <div class="mb-4">
-      <div class="fw-bold mb-2">👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Usuario') ?></div>
+      <div class="fw-bold mb-2">👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Usuario', ENT_QUOTES, 'UTF-8') ?></div>
     </div>
     <div class="flex-grow-1 d-flex flex-column">
       <div class="d-grid gap-3">
@@ -79,151 +77,157 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
 </div>
 <div id="sidebarOverlay"></div>
 
-
 <button id="sidebarToggle" class="btn btn-primary position-fixed" style="top:20px; right:20px; z-index:1100;">
   <i class="bi bi-list" style="font-size:1.5rem;"></i>
 </button>
 
- <?php if (esadmin() && isset($_POST['mostrar_formulario_usuario'])) { ?>
+<?php if (esadmin() && isset($_POST['mostrar_formulario_usuario'])) { ?>
   <div class="row justify-content-center">
-    <div class="col-12 col-md-6">
-      <div class="card shadow-sm mb-4 card-no-bg">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="card shadow-sm mb-4">
         <div class="card-body">
           <h2 class="card-title mb-4 text-center">Crear usuario</h2>
-<form method="post">
-  <div class="row">
-    <div class="col-12 col-md-6 mb-3">
-      <input type="text" name="username" class="form-control" placeholder="Nombre usuario" required>
-    </div>
-    <div class="col-12 col-md-6 mb-3">
-      <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
-    </div>
-    <div class="col-12 mb-3">
-      <select name="rol" class="form-select">
-        <option value="user">Usuario</option>
-        <option value="admin">Admin</option>
-      </select>
+          <form method="post">
+            <div class="row">
+              <div class="col-12 col-md-6 mb-3">
+                <input type="text" name="username" class="form-control" placeholder="Nombre usuario" required>
+              </div>
+              <div class="col-12 col-md-6 mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
+              </div>
+              <div class="col-12 mb-3">
+                <select name="rol" class="form-select">
+                  <option value="user">Usuario</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-2 fw-bold">Otorgar permisos</div>
+            <div class="row mb-3">
+              <div class="col-12 col-md-6">
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="form-check-input" name="puede_crear_entorno" id="crearEntorno">
+                  <label class="form-check-label" for="crearEntorno">Crear entornos</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="form-check-input" name="puede_eliminar_entorno" id="eliminarEntorno">
+                  <label class="form-check-label" for="eliminarEntorno">Eliminar entornos</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="form-check-input" name="puede_editar_entorno" id="editarEntorno">
+                  <label class="form-check-label" for="editarEntorno">Editar entornos</label>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="form-check-input" name="puede_editar_registros" id="editarRegistros">
+                  <label class="form-check-label" for="editarRegistros">Editar registros</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="form-check-input" name="puede_eliminar_registros" id="eliminarRegistros">
+                  <label class="form-check-label" for="eliminarRegistros">Eliminar registros</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="dropdownEntornos" data-bs-toggle="dropdown" aria-expanded="false">
+                  Seleccionar entornos
+                </button>
+                <ul class="dropdown-menu w-100" aria-labelledby="dropdownEntornos" id="entornosDropdownList">
+                  <?php
+                  $entornos_result = $conn->query("SELECT nombre FROM entornos ORDER BY nombre ASC");
+                  while ($ent = $entornos_result->fetch_assoc()):
+                  ?>
+                    <li>
+                      <a class="dropdown-item entorno-item" href="#" data-nombre="<?= htmlspecialchars($ent['nombre']) ?>">
+                        <?= htmlspecialchars($ent['nombre']) ?>
+                      </a>
+                    </li>
+                  <?php endwhile; ?>
+                </ul>
+              </div>
+              <div class="mt-3">
+                <div class="fw-bold mb-1">Seleccionados:</div>
+                <ul id="entornosSeleccionados" class="list-group"></ul>
+              </div>
+            </div>
+            <div id="entornosHiddenInputs"></div>
+            <button type="submit" name="crear_usuario" class="sidebar-btn sidebar-btn-green mt-2 w-100">
+              <i class="bi bi-person-plus"></i> Crear usuario
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
+<?php } ?>
 
-  <!-- Otorgar permisos -->
-<div class="mb-2 fw-bold">Otorgar permisos</div>
-<div class="row mb-3">
-  <div class="col-12">
-    <div class="form-check mb-2">
-      <input type="checkbox" class="form-check-input" name="puede_crear_entorno" id="crearEntorno">
-      <label class="form-check-label" for="crearEntorno">Crear entornos</label>
+<h1 class="text-center my-4">Gestión de Entornos</h1>
+
+<?php if ($_SESSION['puede_crear_entorno']) { ?>
+  <div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-8 col-lg-6">
+      <form action="environments/create_environment.php" method="POST" class="card card-body shadow-sm">
+        <div class="input-group">
+          <input type="text" name="nombre" class="form-control" placeholder="Nombre del entorno" required>
+          <button type="submit" class="btn btn-success">Crear Entorno</button>
+        </div>
+      </form>
     </div>
-    <div class="form-check mb-2">
-      <input type="checkbox" class="form-check-input" name="puede_eliminar_entorno" id="eliminarEntorno">
-      <label class="form-check-label" for="eliminarEntorno">Eliminar entornos</label>
-    </div>
-    <div class="form-check mb-2">
-      <input type="checkbox" class="form-check-input" name="puede_editar_entorno" id="editarEntorno">
-      <label class="form-check-label" for="editarEntorno">Editar entornos</label>
-    </div>
-    <div class="form-check mb-2">
-      <input type="checkbox" class="form-check-input" name="puede_editar_registros" id="editarRegistros">
-      <label class="form-check-label" for="editarRegistros">Editar registros</label>
-    </div>
-    <div class="form-check mb-2">
-      <input type="checkbox" class="form-check-input" name="puede_eliminar_registros" id="eliminarRegistros">
-      <label class="form-check-label" for="eliminarRegistros">Eliminar registros</label>
+  </div>
+<?php } ?>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered align-middle shadow-sm">
+        <thead class="table-success">
+          <tr>
+            <th>Nombre del Entorno</th>
+            <th>Fecha de Creación</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php 
+          $entornos_permitidos_usuario = isset($_SESSION['entornos_asignados']) ? explode(',', $_SESSION['entornos_asignados']) : [];
+          while ($row = $result->fetch_assoc()): 
+            $nombre_entorno_actual = $row['nombre'];
+            $tiene_acceso = ($_SESSION['rol'] === 'admin' || in_array($nombre_entorno_actual, $entornos_permitidos_usuario));
+          ?>
+            <tr>
+              <td><?= htmlspecialchars($nombre_entorno_actual) ?></td>
+              <td><?= $row['fecha_creacion'] ?></td>
+              <td>
+                <?php if ($tiene_acceso): ?>
+                  <form action="entorno.php" method="get" class="d-inline">
+                    <input type="hidden" name="tabla" value="<?= htmlspecialchars($nombre_entorno_actual) ?>">
+                    <button type="submit" class="btn btn-primary btn-sm me-1">
+                      <i class="bi bi-box-arrow-in-right"></i> Ingresar
+                    </button>
+                  </form>
+                  <?php if ($_SESSION['puede_eliminar_entorno']): ?>
+                    <form action="environments/delete_environment.php" method="POST" class="d-inline">
+                      <input type="hidden" name="nombre" value="<?= htmlspecialchars($nombre_entorno_actual) ?>">
+                      <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash"></i> Eliminar
+                      </button>
+                    </form>
+                  <?php endif; ?>
+                <?php else: ?>
+                  <span class="text-danger">No tienes acceso a este entorno</span>
+                <?php endif; ?>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
-  <!-- Entornos asignados -->
-  <div class="mb-3">
-    <div class="dropdown">
-      <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="dropdownEntornos" data-bs-toggle="dropdown" aria-expanded="false">
-        Seleccionar entornos
-      </button>
-      <ul class="dropdown-menu w-100" aria-labelledby="dropdownEntornos" id="entornosDropdownList">
-        <?php
-        $entornos_result = $conn->query("SELECT nombre FROM entornos ORDER BY nombre ASC");
-        while ($ent = $entornos_result->fetch_assoc()):
-        ?>
-          <li>
-            <a class="dropdown-item entorno-item" href="#" data-nombre="<?= htmlspecialchars($ent['nombre']) ?>">
-              <?= htmlspecialchars($ent['nombre']) ?>
-            </a>
-          </li>
-        <?php endwhile; ?>
-      </ul>
-    </div>
-    <div class="mt-3">
-      <div class="fw-bold mb-1">Seleccionados:</div>
-      <ul id="entornosSeleccionados" class="list-group"></ul>
-    </div>
-  </div>
-  <div id="entornosHiddenInputs"></div>
-  <button type="submit" name="crear_usuario" class="sidebar-btn sidebar-btn-green mt-2">
-    <i class="bi bi-person-plus"></i> Crear usuario
-  </button>
-</form>
-      </div>
-      </div>
-    </div>
-  </div>
-<?php } ?>
-
-<h1>Gestión de Entornos</h1>
-
-  <!-- Crear nuevo entorno -->
-  <?php if ($_SESSION['puede_crear_entorno']) { ?>
-  <form action="environments/create_environment.php" method="POST">
-    <input type="text" name="nombre" placeholder="Nombre del entorno" required>
-    <button type="submit">Crear Entorno</button>
-  </form>
-<?php } ?>
-
-  <!-- Lista de entornos existentes -->
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre del Entorno</th>
-        <th>Fecha de Creación</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php 
-      // Obtener los entornos asignados al usuario actual y convertirlos en un array
-      $entornos_permitidos_usuario = isset($_SESSION['entornos_asignados']) ? explode(',', $_SESSION['entornos_asignados']) : [];
-      
-      while ($row = $result->fetch_assoc()): 
-        // Verificar si el usuario tiene acceso al entorno actual
-        $nombre_entorno_actual = $row['nombre'];
-        $tiene_acceso = false;
-        if ($_SESSION['rol'] === 'admin' || in_array($nombre_entorno_actual, $entornos_permitidos_usuario)) {
-          $tiene_acceso = true;
-        }
-      ?>
-        <tr>
-          <td><?= htmlspecialchars($nombre_entorno_actual) ?></td>
-          <td><?= $row['fecha_creacion'] ?></td>
-          <td>
-            <?php if ($tiene_acceso): ?>
-              <form action="entorno.php" method="get" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
-                <input type="hidden" name="tabla" value="<?= htmlspecialchars($nombre_entorno_actual) ?>">
-                <button type="submit" class="action-btn ingresar" style="background:#42a5f5; color:white;">Ingresar</button>
-              </form>
-              <?php if ($_SESSION['puede_eliminar_entorno']): ?>
-                <form action="environments/delete_environment.php" method="POST" style="display:inline-block; margin:0; padding:0; vertical-align:middle;">
-                  <input type="hidden" name="nombre" value="<?= htmlspecialchars($nombre_entorno_actual) ?>">
-                  <button type="submit" class="action-btn eliminar" style="background:#f44336; color:white;">Eliminar</button>
-                </form>
-              <?php endif; ?>
-            <?php else: ?>
-              <span style="color: red;">No tienes acceso a este entorno</span>
-            <?php endif; ?>
-          </td>
-        </tr>
-      <?php endwhile; ?>
-    </tbody>
-  </table>
-  <script src="js/script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
