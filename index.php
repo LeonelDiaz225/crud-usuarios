@@ -49,10 +49,10 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body class="bg-light">
+<body class="bg-dark text-light">
 
 <!-- Sidebar derecha -->
-<div id="sidebar" class="sidebar bg-white shadow position-fixed end-0 top-0 vh-100 p-4">
+<div id="sidebar" class="sidebar bg-dark text-light shadow position-fixed end-0 top-0 vh-100 p-4">
   <div class="d-flex flex-column h-100">
     <div class="mb-4">
       <div class="fw-bold mb-2">👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Usuario', ENT_QUOTES, 'UTF-8') ?></div>
@@ -75,18 +75,18 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
 </div>
 <div id="sidebarOverlay"></div>
 
-<button id="sidebarToggle" class="btn btn-primary position-fixed" style="top:20px; right:20px; z-index:1100;">
+<button id="sidebarToggle" class="btn position-fixed" style="top:20px; right:20px; z-index:1100;">
   <i class="bi bi-list" style="font-size:1.5rem;"></i>
 </button>
 
 <!-- Modal de creación de usuario -->
 <div class="modal fade" id="crearUsuarioModal" tabindex="-1" aria-labelledby="crearUsuarioModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content bg-dark text-light">
       <form method="post">
-        <div class="modal-header">
+        <div class="modal-header border-0">
           <h5 class="modal-title" id="crearUsuarioModalLabel">Crear usuario</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <div class="row">
@@ -97,7 +97,7 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
               <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
             </div>
             <div class="col-12 mb-3">
-              <select name="rol" class="form-select">
+              <select name="rol" class="form-select bg-dark text-light border-secondary">
                 <option value="user">Usuario</option>
                 <option value="admin">Admin</option>
               </select>
@@ -155,7 +155,7 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
           </div>
           <div id="entornosHiddenInputs"></div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer border-0">
           <button type="submit" name="crear_usuario" class="btn btn-success w-100">
             <i class="bi bi-person-plus"></i> Crear usuario
           </button>
@@ -170,7 +170,7 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
 <?php if ($_SESSION['puede_crear_entorno']) { ?>
   <div class="row justify-content-center mb-4">
     <div class="col-12 col-md-8 col-lg-6">
-      <form action="environments/create_environment.php" method="POST" class="card card-body shadow-sm">
+      <form action="environments/create_environment.php" method="POST" class="card card-body shadow-sm bg-dark text-light border-0">
         <div class="input-group">
           <input type="text" name="nombre" class="form-control" placeholder="Nombre del entorno" required>
           <button type="submit" class="btn btn-success">Crear Entorno</button>
@@ -183,7 +183,7 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
 <div class="row justify-content-center">
   <div class="col-12 col-md-10 col-lg-8">
     <div class="table-responsive">
-      <table class="table table-striped table-bordered align-middle shadow-sm">
+      <table class="table table-striped table-bordered align-middle shadow-sm bg-dark text-light">
         <thead class="table-success">
           <tr>
             <th>Nombre del Entorno</th>

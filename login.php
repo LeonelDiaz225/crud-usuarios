@@ -46,13 +46,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="min-height:100vh;">
+<body class="bg-dark d-flex align-items-center justify-content-center" style="min-height:100vh;">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm" style="background:#2c3035; border:none;">
                     <div class="card-body">
-                        <h2 class="card-title text-center mb-4">Iniciar Sesión</h2>
+                        <h2 class="card-title text-center mb-4 text-light">Iniciar Sesión</h2>
                         <?php if (!empty($error)) : ?>
                             <div class="alert alert-danger py-2" role="alert">
                                 <?= htmlspecialchars($error) ?>

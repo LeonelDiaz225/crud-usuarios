@@ -61,7 +61,7 @@ if (
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body class="bg-light">
+<body class="bg-dark text-light">
 
 <div class="container my-4">
 
@@ -69,14 +69,14 @@ if (
     <h1 class="h4 mb-0">Entorno: <?= htmlspecialchars($tabla) ?></h1>
     <a href="logout.php" class="btn btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
   </div>
-  <a href="index.php" class="btn btn-link mb-3 px-0"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
+  <a href="index.php" class="btn btn-link mb-3 px-0 text-light"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
 
 <?php if (isset($mensaje)): ?>
   <div class="alert alert-info" id="mensaje-alert"><?= htmlspecialchars($mensaje) ?></div>
 <?php endif; ?>
 
   <!-- Formulario manual -->
-  <div class="card mb-4">
+  <div class="card mb-4 bg-dark text-light border-0">
     <div class="card-body">
       <h5 class="card-title text-center mb-3">Agregar registro manualmente</h5>
       <form method="POST" autocomplete="off" class="row g-3">
@@ -106,7 +106,7 @@ if (
   </div>
 
   <!-- Formulario CSV -->
-  <div class="card mb-4">
+  <div class="card mb-4 bg-dark text-light border-0">
     <div class="card-body">
       <h5 class="card-title text-center mb-3">Importar CSV</h5>
       <form id="csvForm" action="environments/import_csv_to_environment.php?tabla=<?= htmlspecialchars($tabla) ?>" method="POST" enctype="multipart/form-data" class="row g-3 align-items-center">
@@ -138,7 +138,7 @@ if (
 
   <!-- Tabla de registros -->
   <div class="table-responsive">
-    <table class="table table-striped align-middle">
+    <table class="table table-striped align-middle bg-dark text-light">
       <thead class="table-success">
         <tr>
           <th>Apellido y Nombre</th>
@@ -165,11 +165,11 @@ if (
 <!-- Modal de edición Bootstrap -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content bg-dark text-light">
       <form id="editForm" autocomplete="off">
-        <div class="modal-header">
+        <div class="modal-header border-0">
           <h5 class="modal-title" id="editModalLabel">Editar registro</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <input type="hidden" name="id" id="edit_id">
@@ -183,7 +183,7 @@ if (
             <input type="text" name="rubro" id="edit_rubro" class="form-control mb-2" placeholder="Rubro" required>
           </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer border-0">
           <button type="submit" id="editSaveBtn" class="btn btn-success">Aceptar cambios</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </div>
