@@ -386,6 +386,34 @@ if (csvForm && csvFile) {
     console.warn("No se encontró el formulario CSV");
   }
 
+  // Guardado manual por AJAX
+const manualForm = document.getElementById("manualForm");
+if (manualForm) {
+  manualForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const formData = new FormData(manualForm);
+    formData.append("ajax", "1"); // Para indicar petición AJAX
+
+    fetch(window.location.pathname + window.location.search, {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showFloatingMessage("Registro guardado correctamente.");
+        manualForm.reset();
+        if (typeof loadUsers === "function") loadUsers();
+      } else {
+        showFloatingMessage(data.error || "Error al guardar.", true);
+      }
+    })
+    .catch(() => {
+      showFloatingMessage("Error de conexión.", true);
+    });
+  });
+}
+
  // Exportar tabla a Excel
 const exportBtn = document.getElementById("exportExcelBtn");
 if (exportBtn) {

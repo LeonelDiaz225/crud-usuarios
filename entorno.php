@@ -43,15 +43,28 @@ if (
     $_POST["correo"],
     $_POST["rubro"]
   );
-  
-  if ($stmt->execute()) {
-    header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Registro guardado correctamente."));
+
+  // Si la petición es AJAX (enviamos un campo oculto 'ajax' desde JS)
+  if (isset($_POST['ajax'])) {
+    header('Content-Type: application/json');
+    if ($stmt->execute()) {
+      echo json_encode(['success' => true]);
+    } else {
+      echo json_encode(['success' => false, 'error' => "Error al guardar: " . $conn->error]);
+    }
     exit;
   } else {
-    header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Error al guardar: " . $conn->error));
-    exit;
+    // Fallback tradicional (no debería usarse ya)
+    if ($stmt->execute()) {
+      header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Registro guardado correctamente."));
+      exit;
+    } else {
+      header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Error al guardar: " . $conn->error));
+      exit;
+    }
   }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -73,17 +86,13 @@ if (
   <a href="index.php" class="btn btn-link mb-3 px-0 text-light"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
 
 
-<?php if (isset($_GET['mensaje'])): ?>
-  <div class="mensaje-alert" style="position:fixed;top:20px;right:20px;z-index:9999;background:#198754;color:#fff;padding:12px 24px;border-radius:6px;box-shadow:0 2px 8px #0002;">
-    <?= htmlspecialchars($_GET['mensaje']) ?>
-  </div>
-<?php endif; ?>
+<!-- agregar aca codigo de mensaje-alert -->
 
   <!-- Formulario manual -->
   <div class="card mb-4 bg-dark text-light border-0">
     <div class="card-body">
       <h5 class="card-title text-center mb-3">Agregar registro manualmente</h5>
-      <form method="POST" autocomplete="off" class="row g-3">
+      <form id="manualForm" autocomplete="off" class="row g-3">
         <div class="col-md-6">
           <input type="text" name="apellido_nombre" class="form-control" placeholder="Apellido y Nombre" required>
         </div>
