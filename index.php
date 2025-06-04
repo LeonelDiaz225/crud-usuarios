@@ -151,7 +151,7 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
               </ul>
             </div>
             <div class="mt-3">
-              <div class="fw-bold mb-1">Seleccionados:</div>
+              <div class="fw-bold mb-1">Entornos asignados:</div>
               <ul id="entornosSeleccionados" class="list-group"></ul>
             </div>
           </div>
