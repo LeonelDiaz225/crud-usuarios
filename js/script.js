@@ -11,6 +11,31 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPage = 1;
   const itemsPerPage = 5; // Puedes ajustar esto
 
+if (csvForm) {
+  csvForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    // Agregamos la tabla a formData
+    formData.append('tabla', tabla);
+
+    fetch(`environments/import_csv_to_environment.php?tabla=${tabla}`, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.text())
+    .then(message => {
+      // Limpiamos el mensaje si contiene HTML
+      const cleanMessage = message.replace(/<[^>]*>/g, '').trim();
+      showFloatingMessage(cleanMessage);
+      csvForm.reset();
+      loadUsers(); // Recargar la tabla
+    })
+    .catch(error => {
+      showFloatingMessage('Error al importar el archivo: ' + error.message, true);
+    });
+  });
+}
+
   const buscadorGeneral = document.getElementById("buscadorGeneral");
   let searchTerm = "";
 
@@ -20,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loadUsers(1); // Buscar siempre desde la página 1
     });
   }
+
 
   // Leer permisos del body
   const bodyElement = document.body;
@@ -281,40 +307,6 @@ function handleEdit() {
   }
 }
 
-  // Manejador para el botón de editar (abre el modal y rellena los campos)
-  function handleEdit() {
-    const tr = this.closest("tr");
-    const id = tr.dataset.id;
-    const cells = tr.querySelectorAll("td");
-    const user = {
-      id,
-      apellido_nombre: cells[0].textContent,
-      cuit_dni: cells[1].textContent,
-      razon_social: cells[2].textContent,
-      telefono: cells[3].textContent,
-      correo: cells[4].textContent,
-      rubro: cells[5].textContent
-    };
-    openEditModal(user);
-  }
-
-  // Función para abrir el modal y rellenar los campos
-  function openEditModal(user) {
-    if (!editModal) return;
-    document.getElementById("edit_id").value = user.id;
-    document.getElementById("edit_apellido_nombre").value = user.apellido_nombre;
-    document.getElementById("edit_cuit_dni").value = user.cuit_dni;
-    document.getElementById("edit_razon_social").value = user.razon_social;
-    document.getElementById("edit_telefono").value = user.telefono;
-    document.getElementById("edit_correo").value = user.correo;
-    document.getElementById("edit_rubro").value = user.rubro;
-    editModal.style.display = "block";
-    setTimeout(() => {
-      document.getElementById("edit_apellido_nombre").focus();
-    }, 100);
-  }
-
- 
 
   // Manejar el envío del formulario de edición
 if (editForm) {
@@ -350,40 +342,6 @@ if (editForm) {
     loadUsers();
   } else {
     console.warn("No se encontró tabla o elemento userTableBody");
-  }
-
-  // Configurar el formulario de importación CSV si existe
-if (csvForm && csvFile) {
-  csvForm.addEventListener("submit", function(e) {
-    e.preventDefault();
-    const file = csvFile.files[0];
-    if (!file) {
-      showFloatingMessage("Por favor, seleccione un archivo .CSV", true);
-      return;
-    }
-    const formData = new FormData(csvForm);
-
-    fetch(`environments/import_csv_to_environment.php?tabla=${tabla}`, {
-      method: "POST",
-      body: formData
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.text();
-      })
-      .then(msg => {
-        showFloatingMessage(msg);
-        csvForm.reset();
-        loadUsers(); // Recargar datos después de importar
-      })
-      .catch(err => {
-        showFloatingMessage("Error al importar el CSV: " + err.message, true);
-      });
-  });
-} else {
-    console.warn("No se encontró el formulario CSV");
   }
 
   // Guardado manual por AJAX
@@ -537,6 +495,10 @@ function showFloatingMessage(msg, isError = false) {
   alertDiv.style.padding = "12px 24px";
   alertDiv.style.borderRadius = "6px";
   alertDiv.style.boxShadow = "0 2px 8px #0002";
+  alertDiv.style.fontSize = "1rem";
+  alertDiv.style.maxWidth = "350px";
+  alertDiv.style.minWidth = "220px";
+  alertDiv.style.textAlign = "left";
   alertDiv.textContent = msg;
   document.body.appendChild(alertDiv);
   setTimeout(() => {
@@ -548,14 +510,18 @@ function showFloatingMessage(msg, isError = false) {
   }, 3000);
 }
 
-// Ocultar todas las alertas flotantes (PHP o JS) después de 3 segundos
-document.querySelectorAll('.mensaje-alert').forEach(alertDiv => {
-  setTimeout(() => {
-    alertDiv.style.transition = "opacity 0.5s";
-    alertDiv.style.opacity = 0;
-    setTimeout(() => {
-      if (alertDiv.parentNode) alertDiv.parentNode.removeChild(alertDiv);
-    }, 500);
-  }, 3000);
+
+
+
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+  const phpAlertDiv = document.getElementById('mensaje-alerta');
+  if (phpAlertDiv) {
+    const mensaje = phpAlertDiv.dataset.mensaje;
+    if (mensaje) {
+      showFloatingMessage(mensaje);
+      phpAlertDiv.remove();
+    }
+  }
 });
