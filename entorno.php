@@ -15,6 +15,8 @@ if (!$tabla) {
   die("<div class='container my-5'><div class='alert alert-danger'>Error: Entorno no válido.</div><a href='index.php' class='btn btn-link'><i class='bi bi-arrow-left'></i> Volver a entornos</a></div>");
 }
 
+
+
 $entornos_asignados = isset($_SESSION['entornos_asignados']) ? explode(',', $_SESSION['entornos_asignados']) : [];
 if ($_SESSION['rol'] !== 'admin' && !in_array($tabla, $entornos_asignados)) {
     echo "<div class='container my-5'><div class='alert alert-danger'>No tienes acceso a este entorno.</div></div>";
@@ -44,7 +46,7 @@ if (
     $_POST["rubro"]
   );
 
-  // Si la petición es AJAX (enviamos un campo oculto 'ajax' desde JS)
+  // Agregar esto para manejar la respuesta AJAX
   if (isset($_POST['ajax'])) {
     header('Content-Type: application/json');
     if ($stmt->execute()) {
@@ -53,15 +55,6 @@ if (
       echo json_encode(['success' => false, 'error' => "Error al guardar: " . $conn->error]);
     }
     exit;
-  } else {
-    // Fallback tradicional (no debería usarse ya)
-    if ($stmt->execute()) {
-      header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Registro guardado correctamente."));
-      exit;
-    } else {
-      header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Error al guardar: " . $conn->error));
-      exit;
-    }
   }
 }
 
@@ -86,7 +79,9 @@ if (
   <a href="index.php" class="btn btn-link mb-3 px-0 text-light"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
 
 
-<!-- agregar aca codigo de mensaje-alert -->
+<?php if (!empty($_GET['mensaje'])): ?>
+  <div id="mensaje-alerta" data-mensaje="<?= htmlspecialchars($_GET['mensaje']) ?>" style="display:none"></div>
+<?php endif; ?>
 
   <!-- Formulario manual -->
   <div class="card mb-4 bg-dark text-light border-0">
@@ -120,22 +115,22 @@ if (
 
   <!-- Formulario CSV -->
   <div class="card mb-4 bg-dark text-light border-0">
-    <div class="card-body">
-      <h5 class="card-title text-center mb-3">Importar CSV</h5>
-      <form id="csvForm" action="environments/import_csv_to_environment.php?tabla=<?= htmlspecialchars($tabla) ?>" method="POST" enctype="multipart/form-data" class="row g-3 align-items-center">
-        <div class="col-md-8">
-          <input type="file" id="csvFile" name="csvFile" accept=".csv" class="form-control" required>
-          <input type="hidden" name="tabla" value="<?= htmlspecialchars($tabla) ?>">
-        </div>
-        <div class="col-md-4 text-end">
-          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i> Importar CSV</button>
-        </div>
-      </form>
-      <p class="mt-2 mb-0" style="font-size: 0.95em; color: #ffc107;">
-        El CSV debe tener los campos: Apellido y Nombre, CUIT/DNI, Razón Social, Teléfono, Correo, Rubro.
-      </p>
-    </div>
+  <div class="card-body">
+    <h5 class="card-title text-center mb-3">Importar CSV</h5>
+    <form id="csvForm" class="row g-3 align-items-center">
+      <div class="col-md-8">
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" class="form-control" required>
+        <input type="hidden" name="tabla" value="<?= htmlspecialchars($tabla) ?>">
+      </div>
+      <div class="col-md-4 text-end">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i> Importar CSV</button>
+      </div>
+    </form>
+    <p class="mt-2 mb-0" style="font-size: 0.95em; color: #ffc107;">
+      El CSV debe tener los campos: Apellido y Nombre, CUIT/DNI, Razón Social, Teléfono, Correo, Rubro.
+    </p>
   </div>
+</div>
 
   <!-- Buscador y exportar -->
   <div class="row mb-3">
@@ -221,8 +216,9 @@ if (
   const puedeEliminarRegistros = <?= isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'] ? 'true' : 'false' ?>;
   const tabla = "<?= htmlspecialchars($tabla) ?>";
 </script>
+<script src="js/script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="js/script.js"></script>
+
 </body>
 </html>
