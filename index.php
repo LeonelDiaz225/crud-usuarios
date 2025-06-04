@@ -114,10 +114,12 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
                 <input type="checkbox" class="form-check-input" name="puede_eliminar_entorno" id="eliminarEntorno">
                 <label class="form-check-label" for="eliminarEntorno">Eliminar entornos</label>
               </div>
+              <!-- Descomentar si se desea permitir editar entornos (o quitar de la BDD)
               <div class="form-check mb-2">
                 <input type="checkbox" class="form-check-input" name="puede_editar_entorno" id="editarEntorno">
                 <label class="form-check-label" for="editarEntorno">Editar entornos</label>
               </div>
+              -->
             </div>
             <div class="col-12 col-md-6">
               <div class="form-check mb-2">
