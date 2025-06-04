@@ -429,3 +429,23 @@ form button[type="submit"].sidebar-btn.sidebar-btn-red:hover {
   border-color: #d32f2f !important;
 }
 
+.mensaje-alert {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 9999 !important;
+  background: #198754 !important;
+  color: #fff !important;
+  padding: 12px 24px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px #0002 !important;
+  font-size: 1rem !important;
+  opacity: 1;
+  transition: opacity 0.5s;
+  max-width: 350px;
+  min-width: 220px;
+  text-align: left;
+  margin: 0 !important;
+  display: block !important;
+  pointer-events: auto;
+}

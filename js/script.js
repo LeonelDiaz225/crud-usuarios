@@ -352,40 +352,6 @@ if (editForm) {
     console.warn("No se encontró tabla o elemento userTableBody");
   }
 
-  // Configurar el formulario de importación CSV si existe
-if (csvForm && csvFile) {
-  csvForm.addEventListener("submit", function(e) {
-    e.preventDefault();
-    const file = csvFile.files[0];
-    if (!file) {
-      showFloatingMessage("Por favor, seleccione un archivo .CSV", true);
-      return;
-    }
-    const formData = new FormData(csvForm);
-
-    fetch(`environments/import_csv_to_environment.php?tabla=${tabla}`, {
-      method: "POST",
-      body: formData
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.text();
-      })
-      .then(msg => {
-        showFloatingMessage(msg);
-        csvForm.reset();
-        loadUsers(); // Recargar datos después de importar
-      })
-      .catch(err => {
-        showFloatingMessage("Error al importar el CSV: " + err.message, true);
-      });
-  });
-} else {
-    console.warn("No se encontró el formulario CSV");
-  }
-
   // Guardado manual por AJAX
 const manualForm = document.getElementById("manualForm");
 if (manualForm) {
@@ -537,6 +503,10 @@ function showFloatingMessage(msg, isError = false) {
   alertDiv.style.padding = "12px 24px";
   alertDiv.style.borderRadius = "6px";
   alertDiv.style.boxShadow = "0 2px 8px #0002";
+  alertDiv.style.fontSize = "1rem";
+  alertDiv.style.maxWidth = "350px";
+  alertDiv.style.minWidth = "220px";
+  alertDiv.style.textAlign = "left";
   alertDiv.textContent = msg;
   document.body.appendChild(alertDiv);
   setTimeout(() => {
@@ -548,14 +518,18 @@ function showFloatingMessage(msg, isError = false) {
   }, 3000);
 }
 
-// Ocultar todas las alertas flotantes (PHP o JS) después de 3 segundos
-document.querySelectorAll('.mensaje-alert').forEach(alertDiv => {
-  setTimeout(() => {
-    alertDiv.style.transition = "opacity 0.5s";
-    alertDiv.style.opacity = 0;
-    setTimeout(() => {
-      if (alertDiv.parentNode) alertDiv.parentNode.removeChild(alertDiv);
-    }, 500);
-  }, 3000);
+
+
+
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+  const phpAlertDiv = document.getElementById('mensaje-alerta');
+  if (phpAlertDiv) {
+    const mensaje = phpAlertDiv.dataset.mensaje;
+    if (mensaje) {
+      showFloatingMessage(mensaje);
+      phpAlertDiv.remove();
+    }
+  }
 });

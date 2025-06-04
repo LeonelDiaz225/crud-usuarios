@@ -15,6 +15,8 @@ if (!$tabla) {
   die("<div class='container my-5'><div class='alert alert-danger'>Error: Entorno no válido.</div><a href='index.php' class='btn btn-link'><i class='bi bi-arrow-left'></i> Volver a entornos</a></div>");
 }
 
+
+
 $entornos_asignados = isset($_SESSION['entornos_asignados']) ? explode(',', $_SESSION['entornos_asignados']) : [];
 if ($_SESSION['rol'] !== 'admin' && !in_array($tabla, $entornos_asignados)) {
     echo "<div class='container my-5'><div class='alert alert-danger'>No tienes acceso a este entorno.</div></div>";
@@ -86,7 +88,9 @@ if (
   <a href="index.php" class="btn btn-link mb-3 px-0 text-light"><i class="bi bi-arrow-left"></i> Volver a entornos</a>
 
 
-<!-- agregar aca codigo de mensaje-alert -->
+<?php if (!empty($_GET['mensaje'])): ?>
+  <div id="mensaje-alerta" data-mensaje="<?= htmlspecialchars($_GET['mensaje']) ?>" style="display:none"></div>
+<?php endif; ?>
 
   <!-- Formulario manual -->
   <div class="card mb-4 bg-dark text-light border-0">
@@ -221,8 +225,9 @@ if (
   const puedeEliminarRegistros = <?= isset($_SESSION['puede_eliminar_registros']) && $_SESSION['puede_eliminar_registros'] ? 'true' : 'false' ?>;
   const tabla = "<?= htmlspecialchars($tabla) ?>";
 </script>
+<script src="js/script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="js/script.js"></script>
+
 </body>
 </html>
