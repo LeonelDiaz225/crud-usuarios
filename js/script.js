@@ -11,6 +11,31 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPage = 1;
   const itemsPerPage = 5; // Puedes ajustar esto
 
+if (csvForm) {
+  csvForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    // Agregamos la tabla a formData
+    formData.append('tabla', tabla);
+
+    fetch(`environments/import_csv_to_environment.php?tabla=${tabla}`, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.text())
+    .then(message => {
+      // Limpiamos el mensaje si contiene HTML
+      const cleanMessage = message.replace(/<[^>]*>/g, '').trim();
+      showFloatingMessage(cleanMessage);
+      csvForm.reset();
+      loadUsers(); // Recargar la tabla
+    })
+    .catch(error => {
+      showFloatingMessage('Error al importar el archivo: ' + error.message, true);
+    });
+  });
+}
+
   const buscadorGeneral = document.getElementById("buscadorGeneral");
   let searchTerm = "";
 
@@ -20,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loadUsers(1); // Buscar siempre desde la página 1
     });
   }
+
 
   // Leer permisos del body
   const bodyElement = document.body;

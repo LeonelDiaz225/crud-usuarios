@@ -124,22 +124,22 @@ if (
 
   <!-- Formulario CSV -->
   <div class="card mb-4 bg-dark text-light border-0">
-    <div class="card-body">
-      <h5 class="card-title text-center mb-3">Importar CSV</h5>
-      <form id="csvForm" action="environments/import_csv_to_environment.php?tabla=<?= htmlspecialchars($tabla) ?>" method="POST" enctype="multipart/form-data" class="row g-3 align-items-center">
-        <div class="col-md-8">
-          <input type="file" id="csvFile" name="csvFile" accept=".csv" class="form-control" required>
-          <input type="hidden" name="tabla" value="<?= htmlspecialchars($tabla) ?>">
-        </div>
-        <div class="col-md-4 text-end">
-          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i> Importar CSV</button>
-        </div>
-      </form>
-      <p class="mt-2 mb-0" style="font-size: 0.95em; color: #ffc107;">
-        El CSV debe tener los campos: Apellido y Nombre, CUIT/DNI, Razón Social, Teléfono, Correo, Rubro.
-      </p>
-    </div>
+  <div class="card-body">
+    <h5 class="card-title text-center mb-3">Importar CSV</h5>
+    <form id="csvForm" class="row g-3 align-items-center">
+      <div class="col-md-8">
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" class="form-control" required>
+        <input type="hidden" name="tabla" value="<?= htmlspecialchars($tabla) ?>">
+      </div>
+      <div class="col-md-4 text-end">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i> Importar CSV</button>
+      </div>
+    </form>
+    <p class="mt-2 mb-0" style="font-size: 0.95em; color: #ffc107;">
+      El CSV debe tener los campos: Apellido y Nombre, CUIT/DNI, Razón Social, Teléfono, Correo, Rubro.
+    </p>
   </div>
+</div>
 
   <!-- Buscador y exportar -->
   <div class="row mb-3">

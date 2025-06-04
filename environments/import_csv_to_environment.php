@@ -65,10 +65,10 @@ while (($data = fgetcsv($handle, 1000, ",")) !== false) {
 fclose($handle);
 
 if ($count > 0 && $errors === 0) {
-  header("Location: ../entorno.php?tabla=$tabla&mensaje=" . urlencode("Archivo importado correctamente"));
+    echo "Archivo importado correctamente";
 } elseif ($count > 0 && $errors > 0) {
-  header("Location: ../entorno.php?tabla=$tabla&mensaje=" . urlencode("Importado con advertencias: $count registros correctos, $errors con error."));
+    echo "Importado con advertencias: $count registros correctos, $errors con error.";
 } else {
-  header("Location: ../entorno.php?tabla=$tabla&mensaje=" . urlencode("No se pudo importar ningún registro. Verifique el archivo."));
+    echo "No se pudo importar ningún registro. Verifique el archivo.";
 }
 exit;
