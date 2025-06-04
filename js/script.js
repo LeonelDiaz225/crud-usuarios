@@ -1,4 +1,41 @@
+function showFloatingMessage(msg, isError = false) {
+  let alertDiv = document.createElement('div');
+  alertDiv.className = "mensaje-alert";
+  alertDiv.style.position = "fixed";
+  alertDiv.style.top = "20px";
+  alertDiv.style.right = "20px";
+  alertDiv.style.zIndex = "9999";
+  alertDiv.style.background = isError ? "#dc3545" : "#198754";
+  alertDiv.style.color = "#fff";
+  alertDiv.style.padding = "12px 24px";
+  alertDiv.style.borderRadius = "6px";
+  alertDiv.style.boxShadow = "0 2px 8px #0002";
+  alertDiv.style.fontSize = "1rem";
+  alertDiv.style.maxWidth = "350px";
+  alertDiv.style.minWidth = "220px";
+  alertDiv.style.textAlign = "left";
+  alertDiv.textContent = msg;
+  document.body.appendChild(alertDiv);
+  setTimeout(() => {
+    alertDiv.style.transition = "opacity 0.5s";
+    alertDiv.style.opacity = 0;
+    setTimeout(() => {
+      if (alertDiv.parentNode) alertDiv.parentNode.removeChild(alertDiv);
+    }, 500);
+  }, 3000);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  const phpAlertDiv = document.getElementById('mensaje-alerta');
+  if (phpAlertDiv) {
+    const mensaje = phpAlertDiv.dataset.mensaje;
+    const tipo = phpAlertDiv.dataset.tipo;
+    if (mensaje) {
+      showFloatingMessage(mensaje, tipo === 'danger');
+      phpAlertDiv.remove();
+    }
+  }
+  
   // Obtenemos los parámetros de la URL
   const urlParams = new URLSearchParams(window.location.search);
   const tabla = urlParams.get("tabla");
@@ -483,44 +520,5 @@ overlay.onclick = () => {
   overlay.style.display = 'none';
 };
 
-function showFloatingMessage(msg, isError = false) {
-  let alertDiv = document.createElement('div');
-  alertDiv.className = "mensaje-alert";
-  alertDiv.style.position = "fixed";
-  alertDiv.style.top = "20px";
-  alertDiv.style.right = "20px";
-  alertDiv.style.zIndex = "9999";
-  alertDiv.style.background = isError ? "#dc3545" : "#198754";
-  alertDiv.style.color = "#fff";
-  alertDiv.style.padding = "12px 24px";
-  alertDiv.style.borderRadius = "6px";
-  alertDiv.style.boxShadow = "0 2px 8px #0002";
-  alertDiv.style.fontSize = "1rem";
-  alertDiv.style.maxWidth = "350px";
-  alertDiv.style.minWidth = "220px";
-  alertDiv.style.textAlign = "left";
-  alertDiv.textContent = msg;
-  document.body.appendChild(alertDiv);
-  setTimeout(() => {
-    alertDiv.style.transition = "opacity 0.5s";
-    alertDiv.style.opacity = 0;
-    setTimeout(() => {
-      if (alertDiv.parentNode) alertDiv.parentNode.removeChild(alertDiv);
-    }, 500);
-  }, 3000);
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-  const phpAlertDiv = document.getElementById('mensaje-alerta');
-  if (phpAlertDiv) {
-    const mensaje = phpAlertDiv.dataset.mensaje;
-    if (mensaje) {
-      showFloatingMessage(mensaje);
-      phpAlertDiv.remove();
-    }
-  }
-});
-
 
 });
-

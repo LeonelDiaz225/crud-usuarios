@@ -27,11 +27,17 @@ if (esadmin() && isset($_POST['crear_usuario'])) {
       $hash = password_hash($password, PASSWORD_DEFAULT);
       $stmt = $conn->prepare("INSERT INTO usuarios (username, password, rol, puede_crear_entorno, puede_eliminar_entorno, puede_editar_entorno, puede_editar_registros, puede_eliminar_registros, entornos_asignados) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
       $stmt->bind_param("sssiiiiis", $username, $hash, $rol, $puede_crear_entorno, $puede_eliminar_entorno, $puede_editar_entorno, $puede_editar_registros, $puede_eliminar_registros, $entornos_asignados);
-      if ($stmt->execute()) {
-          echo "<div class='alert alert-success text-center'>Usuario creado correctamente.</div>";
-      } else {
-          echo "<div class='alert alert-danger text-center'>Error al crear usuario: ".$conn->error."</div>";
-      }
+if ($stmt->execute()) {
+    $_SESSION['mensaje'] = "Usuario creado correctamente";
+    $_SESSION['tipo_mensaje'] = "success";
+    header("Location: index.php");
+    exit;
+} else {
+    $_SESSION['mensaje'] = "Error al crear usuario: ".$conn->error;
+    $_SESSION['tipo_mensaje'] = "danger";
+    header("Location: index.php");
+    exit;
+}
   } else {
       echo "<div class='alert alert-danger text-center'>Usuario y contraseña obligatorios.</div>";
   }
@@ -50,6 +56,11 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="bg-dark text-light">
+
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div id="mensaje-alerta" data-mensaje="<?= htmlspecialchars($_SESSION['mensaje']) ?>" style="display:none"></div>
+    <?php unset($_SESSION['mensaje']); ?>
+<?php endif; ?>
 
 <!-- Sidebar derecha -->
 <div id="sidebar" class="sidebar bg-dark text-light shadow position-fixed end-0 top-0 vh-100 p-4">
