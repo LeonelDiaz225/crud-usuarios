@@ -510,11 +510,6 @@ function showFloatingMessage(msg, isError = false) {
   }, 3000);
 }
 
-
-
-
-});
-
 document.addEventListener("DOMContentLoaded", function() {
   const phpAlertDiv = document.getElementById('mensaje-alerta');
   if (phpAlertDiv) {
@@ -525,3 +520,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 });
+
+
+});
+
