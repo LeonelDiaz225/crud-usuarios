@@ -46,7 +46,7 @@ if (
     $_POST["rubro"]
   );
 
-  // Si la petición es AJAX (enviamos un campo oculto 'ajax' desde JS)
+  // Agregar esto para manejar la respuesta AJAX
   if (isset($_POST['ajax'])) {
     header('Content-Type: application/json');
     if ($stmt->execute()) {
@@ -55,15 +55,6 @@ if (
       echo json_encode(['success' => false, 'error' => "Error al guardar: " . $conn->error]);
     }
     exit;
-  } else {
-    // Fallback tradicional (no debería usarse ya)
-    if ($stmt->execute()) {
-      header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Registro guardado correctamente."));
-      exit;
-    } else {
-      header("Location: entorno.php?tabla=" . urlencode($tabla) . "&mensaje=" . urlencode("Error al guardar: " . $conn->error));
-      exit;
-    }
   }
 }
 

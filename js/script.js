@@ -307,40 +307,6 @@ function handleEdit() {
   }
 }
 
-  // Manejador para el botón de editar (abre el modal y rellena los campos)
-  function handleEdit() {
-    const tr = this.closest("tr");
-    const id = tr.dataset.id;
-    const cells = tr.querySelectorAll("td");
-    const user = {
-      id,
-      apellido_nombre: cells[0].textContent,
-      cuit_dni: cells[1].textContent,
-      razon_social: cells[2].textContent,
-      telefono: cells[3].textContent,
-      correo: cells[4].textContent,
-      rubro: cells[5].textContent
-    };
-    openEditModal(user);
-  }
-
-  // Función para abrir el modal y rellenar los campos
-  function openEditModal(user) {
-    if (!editModal) return;
-    document.getElementById("edit_id").value = user.id;
-    document.getElementById("edit_apellido_nombre").value = user.apellido_nombre;
-    document.getElementById("edit_cuit_dni").value = user.cuit_dni;
-    document.getElementById("edit_razon_social").value = user.razon_social;
-    document.getElementById("edit_telefono").value = user.telefono;
-    document.getElementById("edit_correo").value = user.correo;
-    document.getElementById("edit_rubro").value = user.rubro;
-    editModal.style.display = "block";
-    setTimeout(() => {
-      document.getElementById("edit_apellido_nombre").focus();
-    }, 100);
-  }
-
- 
 
   // Manejar el envío del formulario de edición
 if (editForm) {
