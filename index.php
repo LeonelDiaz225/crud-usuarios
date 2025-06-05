@@ -222,14 +222,15 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
                       <i class="bi bi-box-arrow-in-right"></i> Ingresar
                     </button>
                   </form>
-                  <?php if ($_SESSION['puede_eliminar_entorno']): ?>
-                    <form action="environments/delete_environment.php" method="POST" class="d-inline">
-                      <input type="hidden" name="nombre" value="<?= htmlspecialchars($nombre_entorno_actual) ?>">
-                      <button type="submit" class="btn btn-danger btn-sm">
+                    <?php if ($_SESSION['puede_eliminar_entorno']): ?>
+                      <button type="button" 
+                              class="btn btn-danger btn-sm"
+                              data-bs-toggle="modal" 
+                              data-bs-target="#deleteEnvironmentModal"
+                              data-environment-name="<?= htmlspecialchars($nombre_entorno_actual) ?>">
                         <i class="bi bi-trash"></i> Eliminar
                       </button>
-                    </form>
-                  <?php endif; ?>
+                    <?php endif; ?>
                 <?php else: ?>
                   <span class="text-danger">No tienes acceso a este entorno</span>
                 <?php endif; ?>
@@ -238,6 +239,34 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
           <?php endwhile; ?>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="deleteEnvironmentModal" tabindex="-1" aria-labelledby="deleteEnvironmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="deleteEnvironmentModalLabel">Confirmar eliminación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Está seguro que desea eliminar el entorno "<span id="environmentToDelete"></span>"?
+        <p class="text-danger mt-2 mb-0">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Esta acción no se puede deshacer
+        </p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form id="deleteEnvironmentForm" action="environments/delete_environment.php" method="POST" class="d-inline m-0">
+          <input type="hidden" name="nombre" id="environmentNameInput">
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-2"></i>Eliminar
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

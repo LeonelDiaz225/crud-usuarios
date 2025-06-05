@@ -520,5 +520,22 @@ overlay.onclick = () => {
   overlay.style.display = 'none';
 };
 
+// Modal de confirmación para eliminar entorno
+const deleteEnvironmentModal = document.getElementById('deleteEnvironmentModal');
+if (deleteEnvironmentModal) {
+  deleteEnvironmentModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const environmentName = button.getAttribute('data-environment-name');
+    
+    // Actualizar el nombre del entorno en el modal
+    const environmentSpan = document.getElementById('environmentToDelete');
+    const environmentInput = document.getElementById('environmentNameInput');
+    
+    if (environmentSpan && environmentInput) {
+      environmentSpan.textContent = environmentName;
+      environmentInput.value = environmentName;
+    }
+  });
+}
 
 });
