@@ -17,29 +17,48 @@ if (esadmin() && isset($_POST['crear_usuario'])) {
   $username = trim($_POST['username'] ?? '');
   $password = $_POST['password'] ?? '';
   $rol = $_POST['rol'] ?? 'user';
+  
+  // Inicializar los valores de los permisos desde los checkboxes
   $puede_crear_entorno = isset($_POST['puede_crear_entorno']) ? 1 : 0;
   $puede_eliminar_entorno = isset($_POST['puede_eliminar_entorno']) ? 1 : 0;
   $puede_editar_entorno = isset($_POST['puede_editar_entorno']) ? 1 : 0;
   $puede_editar_registros = isset($_POST['puede_editar_registros']) ? 1 : 0;
   $puede_eliminar_registros = isset($_POST['puede_eliminar_registros']) ? 1 : 0;
-  $entornos_asignados = isset($_POST['entornos_asignados']) && is_array($_POST['entornos_asignados']) ? implode(',', $_POST['entornos_asignados']) : '';
-  if ($username && $password) {
-      $hash = password_hash($password, PASSWORD_DEFAULT);
-      $stmt = $conn->prepare("INSERT INTO usuarios (username, password, rol, puede_crear_entorno, puede_eliminar_entorno, puede_editar_entorno, puede_editar_registros, puede_eliminar_registros, entornos_asignados) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-      $stmt->bind_param("sssiiiiis", $username, $hash, $rol, $puede_crear_entorno, $puede_eliminar_entorno, $puede_editar_entorno, $puede_editar_registros, $puede_eliminar_registros, $entornos_asignados);
-if ($stmt->execute()) {
-    $_SESSION['mensaje'] = "Usuario creado correctamente";
-    $_SESSION['tipo_mensaje'] = "success";
-    header("Location: index.php");
-    exit;
-} else {
-    $_SESSION['mensaje'] = "Error al crear usuario: ".$conn->error;
+  
+  // Procesar los entornos asignados
+  $entornos_asignados = isset($_POST['entornos_asignados']) ? implode(',', $_POST['entornos_asignados']) : '';
+  
+  // Verificar si el usuario ya existe
+  $check_stmt = $conn->prepare("SELECT id FROM usuarios WHERE username = ?");
+  $check_stmt->bind_param("s", $username);
+  $check_stmt->execute();
+  $check_result = $check_stmt->get_result();
+  
+  if ($check_result->num_rows > 0) {
+    $_SESSION['mensaje'] = "Error: El usuario '$username' ya existe";
     $_SESSION['tipo_mensaje'] = "danger";
     header("Location: index.php");
     exit;
-}
+  }
+
+  if ($username && $password) {
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("INSERT INTO usuarios (username, password, rol, puede_crear_entorno, puede_eliminar_entorno, puede_editar_entorno, puede_editar_registros, puede_eliminar_registros, entornos_asignados) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssiiiiis", $username, $hash, $rol, $puede_crear_entorno, $puede_eliminar_entorno, $puede_editar_entorno, $puede_editar_registros, $puede_eliminar_registros, $entornos_asignados);
+    
+    if ($stmt->execute()) {
+      $_SESSION['mensaje'] = "Usuario creado correctamente";
+      $_SESSION['tipo_mensaje'] = "success";
+      header("Location: index.php");
+      exit;
+    } else {
+      $_SESSION['mensaje'] = "Error al crear usuario: ".$conn->error;
+      $_SESSION['tipo_mensaje'] = "danger";
+      header("Location: index.php");
+      exit;
+    }
   } else {
-      echo "<div class='alert alert-danger text-center'>Usuario y contraseña obligatorios.</div>";
+    echo "<div class='alert alert-danger text-center'>Usuario y contraseña obligatorios.</div>";
   }
 }
 $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
@@ -58,8 +77,15 @@ $result = $conn->query("SELECT * FROM entornos ORDER BY fecha_creacion DESC");
 <body class="bg-dark text-light">
 
 <?php if (isset($_SESSION['mensaje'])): ?>
-    <div id="mensaje-alerta" data-mensaje="<?= htmlspecialchars($_SESSION['mensaje']) ?>" style="display:none"></div>
-    <?php unset($_SESSION['mensaje']); ?>
+    <div id="mensaje-alerta" 
+         data-mensaje="<?= htmlspecialchars($_SESSION['mensaje']) ?>" 
+         data-tipo="<?= htmlspecialchars($_SESSION['tipo_mensaje'] ?? 'success') ?>" 
+         style="display:none">
+    </div>
+    <?php 
+    unset($_SESSION['mensaje']); 
+    unset($_SESSION['tipo_mensaje']);
+    ?>
 <?php endif; ?>
 
 <!-- Sidebar derecha -->
