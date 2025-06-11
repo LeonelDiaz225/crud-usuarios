@@ -1,90 +1,60 @@
 <?php
-header('Content-Type: application/json');
 include "../includes/db.php";
 
 $tabla = preg_replace('/[^a-zA-Z0-9_]/', '', $_GET['tabla'] ?? '');
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+
 $offset = ($page - 1) * $limit;
-$search = trim($_GET['search'] ?? '');
 
-// Obtener campos
-$stmt = $conn->prepare("SELECT nombre_campo, tipo_campo FROM entornos_campos 
-                       WHERE entorno_nombre = ? ORDER BY orden");
-$stmt->bind_param("s", $tabla);
-$stmt->execute();
-$result = $stmt->get_result();
-$campos = [];
-$primer_campo_texto = '';
+// Construir la consulta base
+$sql = "SELECT * FROM `$tabla` WHERE 1=1";
+$countSql = "SELECT COUNT(*) as total FROM `$tabla` WHERE 1=1";
 
-while ($campo = $result->fetch_assoc()) {
-    $campos[] = $campo['nombre_campo'];
-    // Guardar el primer campo de tipo texto para ordenamiento
-    if (empty($primer_campo_texto) && $campo['tipo_campo'] === 'texto') {
-        $primer_campo_texto = $campo['nombre_campo'];
-    }
-}
-
-// Construir consulta base
-$fields = empty($campos) ? '*' : 'id, ' . implode(', ', $campos);
-$sql = "SELECT $fields FROM `$tabla`";
-
-// Agregar WHERE si hay búsqueda
-if ($search !== "") {
-    $whereParts = [];
-    $params = [];
-    $types = "";
+// Agregar condición de búsqueda si existe término
+if (!empty($search)) {
+    $searchTerm = $conn->real_escape_string($search);
+    $searchCondition = [];
     
-    foreach ($campos as $campo) {
-        $whereParts[] = "`$campo` LIKE ?";
-        $params[] = "%$search%";
-        $types .= "s";
+    // Obtener todas las columnas de la tabla
+    $columnsResult = $conn->query("SHOW COLUMNS FROM `$tabla`");
+    while($column = $columnsResult->fetch_assoc()) {
+        $searchCondition[] = "`{$column['Field']}` LIKE '%$searchTerm%'";
     }
     
-    if (!empty($whereParts)) {
-        $sql .= " WHERE " . implode(" OR ", $whereParts);
+    if (!empty($searchCondition)) {
+        $searchSql = " AND (" . implode(" OR ", $searchCondition) . ")";
+        $sql .= $searchSql;
+        $countSql .= $searchSql;
     }
 }
 
-// Agregar ORDER BY antes del LIMIT
-if (!empty($primer_campo_texto)) {
-    $sql .= " ORDER BY `$primer_campo_texto` ASC";
-}
-
-// Agregar LIMIT después del ORDER BY
+// Agregar límite y offset
 $sql .= " LIMIT ? OFFSET ?";
 
-// Preparar y ejecutar la consulta
+// Ejecutar consulta de conteo
+$totalResult = $conn->query($countSql);
+$totalRow = $totalResult->fetch_assoc();
+$total = $totalRow['total'];
+
+// Preparar y ejecutar la consulta principal
 $stmt = $conn->prepare($sql);
-
-if (!empty($params)) {
-    $params[] = $limit;
-    $params[] = $offset;
-    $types .= "ii";
-    $stmt->bind_param($types, ...$params);
-} else {
-    $stmt->bind_param("ii", $limit, $offset);
-}
-
+$stmt->bind_param("ii", $limit, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
-$data = $result->fetch_all(MYSQLI_ASSOC);
 
-// Contar total
-$countSql = "SELECT COUNT(*) as total FROM `$tabla`" . 
-            (!empty($whereParts) ? " WHERE " . implode(" OR ", $whereParts) : "");
-
-$stmt = $conn->prepare($countSql);
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
+$data = [];
+while ($row = $result->fetch_assoc()) {
+    $data[] = $row;
 }
-$stmt->execute();
-$total = $stmt->get_result()->fetch_assoc()['total'];
 
-
+// Devolver resultado como JSON
+header('Content-Type: application/json');
 echo json_encode([
+    'success' => true,
     'data' => $data,
     'total' => $total,
     'page' => $page,
-    'pages' => ceil($total / $limit)
+    'limit' => $limit
 ]);

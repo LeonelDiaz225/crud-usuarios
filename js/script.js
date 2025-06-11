@@ -109,109 +109,98 @@ if (csvForm) {
     paginationControls: !!paginationControls // Nuevo
   });
 
-  function loadUsers(page = 1) { // Modificado para aceptar la página
+function loadUsers(page = 1) {
     if (!tabla || !userTableBody) {
-      console.error("No se puede cargar usuarios: falta tabla o contenedor");
-      return;
+        console.error("No se puede cargar usuarios: falta tabla o contenedor");
+        return;
     }
     currentPage = page;
-    console.log(`Intentando cargar usuarios para tabla: ${tabla}, página: ${page}, límite: ${itemsPerPage}`);
     
     let url = `environments/read.php?tabla=${tabla}&page=${page}&limit=${itemsPerPage}`;
     if (searchTerm && searchTerm.trim() !== "") {
-      url += `&search=${encodeURIComponent(searchTerm.trim())}`;
+        url += `&search=${encodeURIComponent(searchTerm.trim())}`;
     }
+
     fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Error HTTP: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(response => {
+            if (!response.success) {
+                throw new Error(response.error || 'Error al cargar los datos');
+            }
 
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(response => { // Modificado para manejar la nueva estructura de respuesta
-        console.log("Datos recibidos:", response);
-        const data = response.data;
-        const totalItems = response.total;
-        
-        userTableBody.innerHTML = ""; // Limpiamos la tabla
+            const data = response.data;
+            const totalItems = response.total;
+            
+            userTableBody.innerHTML = "";
 
-        if (!Array.isArray(data)) {
-          console.error("Los datos recibidos no son un array:", data);
-          userTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center">Error: los datos recibidos no son válidos</td></tr>';
-          updatePaginationControls(0, page, itemsPerPage);
-          return;
-        }
+            if (!Array.isArray(data)) {
+                console.error("Los datos recibidos no son un array:", data);
+                userTableBody.innerHTML = '<tr><td colspan="100%" class="text-center">Error: los datos recibidos no son válidos</td></tr>';
+                updatePaginationControls(0, page, itemsPerPage);
+                return;
+            }
 
-        if (data.length === 0 && page === 1) {
-          console.log("No hay registros para mostrar");
-          const emptyRow = document.createElement("tr");
-          emptyRow.innerHTML = '<td colspan="7" style="text-align: center">No hay registros disponibles</td>';
-          userTableBody.appendChild(emptyRow);
-          updatePaginationControls(0, page, itemsPerPage);
-          return;
-        } else if (data.length === 0 && page > 1) {
-          // Esto podría pasar si se navega a una página que ya no tiene datos (ej. después de eliminar)
-          console.log("No hay registros en esta página, volviendo a la primera.");
-          loadUsers(1); // Cargar la primera página
-          return;
-        }
+            if (data.length === 0) {
+                userTableBody.innerHTML = '<tr><td colspan="100%" class="text-center">No se encontraron registros</td></tr>';
+                updatePaginationControls(0, page, itemsPerPage);
+                return;
+            }
 
-data.forEach(user => {
-    const row = document.createElement("tr");
-    row.setAttribute("data-id", user.id);
+            data.forEach(user => {
+                const row = document.createElement("tr");
+                row.setAttribute("data-id", user.id);
 
-    // Creamos las celdas para cada campo
-    Object.keys(user).forEach(key => {
-        if (key !== 'id') { // No mostrar el ID en la tabla
-            const td = document.createElement("td");
-            td.textContent = user[key] || '';
-            row.appendChild(td);
-        }
-    });
+                // Crear celdas para cada campo
+                Object.keys(user).forEach(key => {
+                    if (key !== 'id') {
+                        const td = document.createElement("td");
+                        td.textContent = user[key] || '';
+                        row.appendChild(td);
+                    }
+                });
 
-    // Agregar columna de acciones SOLO si tiene algún permiso
-    if (puedeEditarRegistros || puedeEliminarRegistros) {
-        const tdAcciones = document.createElement("td");
-        
- if (puedeEditarRegistros) {
-    const btnEditar = document.createElement("button");
-    btnEditar.className = "btn btn-warning btn-sm edit-btn me-1";
-    btnEditar.innerHTML = '<i class="bi bi-pencil"></i> Editar';
-    btnEditar.setAttribute("data-bs-toggle", "modal");
-    btnEditar.setAttribute("data-bs-target", "#editModal");
-    // Asegurarse de que el botón tenga el ID del registro
-    btnEditar.setAttribute("data-id", user.id);
-    tdAcciones.appendChild(btnEditar);
+                // Agregar columna de acciones si tiene permisos
+                if (puedeEditarRegistros || puedeEliminarRegistros) {
+                    const tdAcciones = document.createElement("td");
+                    
+                    if (puedeEditarRegistros) {
+                        const btnEditar = document.createElement("button");
+                        btnEditar.className = "btn btn-warning btn-sm edit-btn me-1";
+                        btnEditar.innerHTML = '<i class="bi bi-pencil"></i> Editar';
+                        btnEditar.setAttribute("data-bs-toggle", "modal");
+                        btnEditar.setAttribute("data-bs-target", "#editModal");
+                        btnEditar.setAttribute("data-id", user.id);
+                        tdAcciones.appendChild(btnEditar);
+                    }
+                    
+                    if (puedeEliminarRegistros) {
+                        const btnEliminar = document.createElement("button");
+                        btnEliminar.className = "btn btn-danger btn-sm delete-btn";
+                        btnEliminar.innerHTML = '<i class="bi bi-trash"></i> Eliminar';
+                        tdAcciones.appendChild(btnEliminar);
+                    }
+                    
+                    row.appendChild(tdAcciones);
+                }
+
+                userTableBody.appendChild(row);
+            });
+
+            activarBotones();
+            updatePaginationControls(totalItems, page, itemsPerPage);
+        })
+        .catch(error => {
+            console.error("Error al cargar datos:", error);
+            userTableBody.innerHTML = `<tr><td colspan="100%" class="text-center text-danger">
+                Error al cargar datos: ${error.message}</td></tr>`;
+            updatePaginationControls(0, currentPage, itemsPerPage);
+        });
 }
-        
-        if (puedeEliminarRegistros) {
-            const btnEliminar = document.createElement("button");
-            btnEliminar.className = "btn btn-danger btn-sm delete-btn";
-            btnEliminar.innerHTML = '<i class="bi bi-trash"></i> Eliminar';
-            tdAcciones.appendChild(btnEliminar);
-        }
-        
-        row.appendChild(tdAcciones);
-    }
-
-    userTableBody.appendChild(row);
-});
-
-        // Activamos los botones de edición y eliminación
-        activarBotones();
-        // Actualizamos los controles de paginación
-        updatePaginationControls(totalItems, page, itemsPerPage);
-      })
-      .catch(error => {
-        console.error("Error al cargar datos:", error);
-        if (userTableBody) {
-          userTableBody.innerHTML = `<tr><td colspan="7" style="color: red; text-align: center">
-            Error al cargar datos: ${error.message}</td></tr>`;
-        }
-        updatePaginationControls(0, currentPage, itemsPerPage); // Limpiar controles en caso de error
-      });
-  }
 
   function updatePaginationControls(totalItems, currentPage, itemsPerPage) {
     if (!paginationControls) return;
