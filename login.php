@@ -1,7 +1,7 @@
 <?php
 session_start();
 include "includes/db.php";
-
+//test
 $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST["username"] ?? "");
